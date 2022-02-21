@@ -108,13 +108,16 @@ export class Graph<T, U> {
   }
 
   getNodeNotVisited(
-    distances: Map<GraphNode<T, U>, number>,
+    distances: Map<
+      GraphNode<T, U>,
+      { number: number } & { node: [GraphNode<T, U>, U] }
+    >,
     visited: Map<GraphNode<T, U>, GraphNode<T, U>>
   ) {
     let nextNode = null;
     distances.forEach((value, key) => {
       if (!visited.has(key)) {
-        nextNode = key;
+        nextNode = value;
       }
     });
 
@@ -122,52 +125,64 @@ export class Graph<T, U> {
   }
 
   dijkstras(node: GraphNode<T, U>, target: GraphNode<T, U>) {
-    const distances = new Map<GraphNode<T, U>, number>();
+    const distances = new Map<
+      GraphNode<T, U>,
+      { number: number } & { node: [GraphNode<T, U>, U] }
+    >();
     const visited = new Map<GraphNode<T, U>, GraphNode<T, U>>();
-    const parents = new Map<GraphNode<T, U>, GraphNode<T, U>>();
+    const parents = new Map<
+      GraphNode<T, U>,
+      { number: number } & { node: [GraphNode<T, U>, U] }
+    >();
 
-    distances.set(target, Infinity);
+    distances.set(target, { number: Infinity, node: [target, null] });
 
-    parents.set(target, null);
+    parents.set(target, { number: null, node: null });
 
     node.getAdjacents().forEach((child) => {
       const [distance] = child;
-      parents.set(distance, node);
-      distances.set(distance, 1);
+      parents.set(distance, { number: null, node: [node, null] });
+      distances.set(distance, { number: 1, node: child });
     });
 
     let nodeToProcess = this.getNodeNotVisited(distances, visited);
     console.log('STARTING-------');
     while (nodeToProcess) {
-      console.log('Processing node------', nodeToProcess.value);
-      const distance = distances.get(nodeToProcess);
+      const distance = distances.get(nodeToProcess.node[0]).number;
 
-      const children = nodeToProcess.getAdjacents();
+      const children = nodeToProcess.node[0].getAdjacents();
 
-      children.forEach(([child]) => {
+      children.forEach((c) => {
+        const [child] = c;
         if (!(child === node)) {
           const newdistance = distance + 1;
 
-          if (!distances.has(child) || distances.get(child) > newdistance) {
-            distances.set(child, newdistance);
+          if (
+            !distances.has(child) ||
+            distances.get(child).number > newdistance
+          ) {
+            distances.set(child, { number: newdistance, node: c });
             parents.set(child, nodeToProcess);
           }
         }
       });
 
-      visited.set(nodeToProcess, nodeToProcess);
+      visited.set(nodeToProcess.node[0], nodeToProcess);
 
       nodeToProcess = this.getNodeNotVisited(distances, visited);
     }
     console.log('DONE--------------');
-    console.log(distances);
+
     const path = [];
     let parent = parents.get(target);
     while (parent) {
-      path.push(parent);
-      parent = parents.get(parent);
-    }
+      const par = (parent as any)?.node?.[0];
 
+      if (par) {
+        path.push(parent);
+      }
+      parent = parents.get(par);
+    }
     return path.reverse();
   }
 }

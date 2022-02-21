@@ -26,7 +26,7 @@ export default ({
 
           const r = [];
           res.forEach((item) => {
-            r.push(item.value.commonName);
+            r.push(`${item.node[0].value.commonName} ${item.node[1]?.line}`);
           });
           setResult(r);
         }}
