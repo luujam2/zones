@@ -1433,6 +1433,8 @@ export default {
       { name: 'southtottenham', line: 'osi' },
       { name: 'tottenhamhale', line: 'victoria' },
       { name: 'finsburypark', line: 'victoria' },
+      { name: 'stamfordhill', line: 'overground' },
+      { name: 'brucegrove', line: 'overground' },
     ],
   },
   shadwell: {

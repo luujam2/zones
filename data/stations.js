@@ -876,18 +876,6 @@ export default [
     zone: '5',
   },
   {
-    commonName: 'Heathrow Airport Terminal 4',
-    modes: ['bus', 'national-rail', 'tube', 'plane', 'tflrail'],
-    id: 'HUBHX4',
-    zone: '6',
-  },
-  {
-    commonName: 'Heathrow Airport Terminal 5',
-    modes: ['bus', 'national-rail', 'plane', 'tflrail', 'tube'],
-    id: 'HUBHX5',
-    zone: '6',
-  },
-  {
     commonName: 'Heathrow Terminal 4',
     modes: ['tube'],
     id: '940GZZLUHR4',
@@ -903,12 +891,6 @@ export default [
     commonName: 'Heathrow Terminals 1-2-3',
     modes: ['tube'],
     id: '9400ZZLUHRC2',
-    zone: '6',
-  },
-  {
-    commonName: 'Heathrow Terminals 2 & 3',
-    modes: ['national-rail', 'bus', 'tube', 'plane', 'tflrail'],
-    id: 'HUBH13',
     zone: '6',
   },
   {

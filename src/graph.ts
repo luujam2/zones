@@ -6,7 +6,7 @@ export enum GraphDir {
 }
 
 export class Graph<T, U> {
-  nodes: Map<any, GraphNode<T, U>>;
+  nodes: Map<T, GraphNode<T, U>>;
   edgeDirection: GraphDir;
 
   constructor(edgeDirection = GraphDir.UNDIRECTED) {
@@ -28,45 +28,22 @@ export class Graph<T, U> {
 
   addVertex(value: T): GraphNode<T, U> {
     if (this.nodes.has(value)) {
-      return this.nodes.get(value) as GraphNode<T, U>;
+      return this.nodes.get(value);
     } else {
       const vertex = new GraphNode<T, U>(value);
-      this.nodes.set(vertex, vertex);
+      this.nodes.set(value, vertex);
       return vertex;
     }
-  }
-
-  isReachable(first: GraphNode<T, U>, target: GraphNode<T, U>) {
-    const visited = new Map();
-    const visitList: [GraphNode<T, U>, U][] = [];
-
-    visitList.push([first] as any);
-
-    while (!(visitList.length === 0) && !visited.has(target)) {
-      //take the first node off the queue
-      const [node, weight] = visitList.shift() as [GraphNode<T, U>, U];
-
-      // if node exists and it hasn't been visited, add it to list of visited
-      // traverse child nodes
-      if (node && !visited.has(node)) {
-        visited.set(node, [node, weight]);
-        node.getAdjacents().forEach(([adj, weight]) => {
-          visitList.push([adj, weight]);
-        });
-      } else {
-        return true;
-      }
-    }
-
-    return visited.values();
   }
 
   dfs(first: GraphNode<T, U>, target: GraphNode<T, U>) {
     const path = [];
     const visited = new Map();
     const stack = [];
+    const result = this.searchTree(first, target, path, visited, stack);
 
-    return this.searchTree(first, target, path, visited, stack);
+    console.log('result---', result);
+    return result;
   }
 
   searchTree(
@@ -95,7 +72,10 @@ export class Graph<T, U> {
 
     if (isNodeExplored(node, visited)) {
       // if all the adjacents have been visited then the path should be cleaned up
-      while (isNodeExplored(path[path.length - 1], visited)) {
+      while (
+        path.length > 0 &&
+        isNodeExplored(path[path.length - 1], visited)
+      ) {
         path.pop();
       }
     }
@@ -175,6 +155,7 @@ export class Graph<T, U> {
 
     const path = [];
     let parent = parents.get(target);
+    path.push(distances.get(target));
     while (parent) {
       const par = (parent as any)?.node?.[0];
 

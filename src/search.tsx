@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Graph } from './graph';
 import { Edge, nameToMapKey, Station } from './main';
+import Result from './result';
 
 export default ({
   stations,
@@ -14,6 +15,9 @@ export default ({
   const [startStation, setStartStation] = useState('');
   const [endStation, setEndStation] = useState('');
   const [result, setResult] = useState(null);
+  const [dfsResult, setDfsResult] = useState(null);
+
+  const dfs = false;
   return (
     <>
       <form
@@ -24,11 +28,16 @@ export default ({
             stationMappings[nameToMapKey(endStation)]
           );
 
-          const r = [];
-          res.forEach((item) => {
-            r.push(`${item.node[0].value.commonName} ${item.node[1]?.line}`);
-          });
-          setResult(r);
+          setResult(Array.from(res));
+
+          setDfsResult(
+            Array.from(
+              london.dfs(
+                stationMappings[nameToMapKey(startStation)],
+                stationMappings[nameToMapKey(endStation)]
+              )
+            )
+          );
         }}
       >
         <label htmlFor="starting-station">Start station:</label>
@@ -54,13 +63,23 @@ export default ({
         </datalist>
         <input type="submit" value="Find path" />
       </form>
-      {result && (
-        <div>
-          {result.map((stn) => {
-            return <div>{stn}</div>;
-          })}
-        </div>
-      )}
+      <div style={{ display: 'flex' }}>
+        {result && (
+          <div style={{ flex: '50% 1 1' }}>
+            <Result result={result} />
+          </div>
+        )}
+        {dfs && dfsResult && (
+          <div style={{ flex: '50% 1 1' }}>
+            <div>{dfsResult.length}</div>
+            {dfsResult.map((station) => (
+              <div key={station.value.commonName}>
+                {station.value.commonName}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </>
   );
 };
