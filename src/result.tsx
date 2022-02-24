@@ -109,6 +109,12 @@ const PinkReader = styled.span`
   font-size: 10px;
 `;
 
+const ZoneOne = styled.div`
+  display: flex;
+  justify-content: center;
+  padding: 5px 0;
+`;
+
 const variants = {
   open: () => ({
     height: 'auto',
@@ -254,7 +260,7 @@ const findMaxJourneyTime = (zones: string[]) => {
   }
 };
 
-export default ({ result }) => {
+export default ({ result, zoneOneStart, zoneOneEnd }) => {
   const data = result.map((res) => res.node);
 
   const findNextChange = (index, currentLine) => {
@@ -320,9 +326,11 @@ export default ({ result }) => {
           maxJourneyTime % 60
         } minutes`}
       </div>
+      {zoneOneStart && <ZoneOne>Walk from {zoneOneStart}</ZoneOne>}
       {stationChangePairs.map((pairs, index) => {
         return <Trip key={index} {...pairs} />;
       })}
+      {zoneOneEnd && <ZoneOne>Walk to {zoneOneEnd}</ZoneOne>}
     </>
   );
 };

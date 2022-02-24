@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   $type:
     'Tfl.Api.Presentation.Entities.StopPointsResponse, Tfl.Api.Presentation.Entities',
   stopPoints: [

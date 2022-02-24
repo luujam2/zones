@@ -36,71 +36,92 @@ export class Graph<T, U> {
     }
   }
 
-  dfs(first: GraphNode<T, U>, target: GraphNode<T, U>) {
-    const path = [];
-    const visited = new Map();
-    const stack = [];
-    const result = this.searchTree(first, target, path, visited, stack);
+  // dfs(first: GraphNode<T, U>, target: GraphNode<T, U>) {
+  //   const path = [];
+  //   const visited = new Map();
+  //   const stack = [];
+  //   const result = this.searchTree(first, target, path, visited, stack);
 
-    console.log('result---', result);
-    return result;
-  }
+  //   console.log('result---', result);
+  //   return result;
+  // }
 
-  searchTree(
-    node: GraphNode<T, U>,
-    target: GraphNode<T, U>,
-    path,
-    visited,
-    stack
-  ) {
-    path.push(node);
-    visited.set(node, [node]);
-    //node found return accumulated path
-    if (node === target) {
-      return path;
-    }
+  // searchTree(
+  //   node: GraphNode<T, U>,
+  //   target: GraphNode<T, U>,
+  //   path,
+  //   visited,
+  //   stack
+  // ) {
+  //   path.push(node);
+  //   visited.set(node, [node]);
+  //   //node found return accumulated path
+  //   if (node === target) {
+  //     return path;
+  //   }
 
-    // node not found, traverse adjacent nodes
-    node.getAdjacents().forEach(([node, weight]) => {
-      if (!visited.has(node)) {
-        if (node.value == null) {
-          console.log('error!-----', node);
-        }
-        stack.push([node, weight]);
-      }
-    });
+  //   // node not found, traverse adjacent nodes
+  //   node.getAdjacents().forEach(([node, weight]) => {
+  //     if (!visited.has(node)) {
+  //       if (node.value == null) {
+  //         console.log('error!-----', node);
+  //       }
+  //       stack.push([node, weight]);
+  //     }
+  //   });
 
-    if (isNodeExplored(node, visited)) {
-      // if all the adjacents have been visited then the path should be cleaned up
-      while (
-        path.length > 0 &&
-        isNodeExplored(path[path.length - 1], visited)
-      ) {
-        path.pop();
-      }
-    }
+  //   if (isNodeExplored(node, visited)) {
+  //     // if all the adjacents have been visited then the path should be cleaned up
+  //     while (
+  //       path.length > 0 &&
+  //       isNodeExplored(path[path.length - 1], visited)
+  //     ) {
+  //       path.pop();
+  //     }
+  //   }
 
-    if (stack.length) {
-      //carry on with traversal
-      const [n] = stack.pop();
-      return this.searchTree(n, target, path, visited, stack);
-    }
-  }
+  //   if (stack.length) {
+  //     //carry on with traversal
+  //     const [n] = stack.pop();
+  //     return this.searchTree(n, target, path, visited, stack);
+  //   }
+  // }
 
   getNodeNotVisited(
     distances: Map<
       GraphNode<T, U>,
       { number: number } & { node: [GraphNode<T, U>, U] }
     >,
-    visited: Map<GraphNode<T, U>, GraphNode<T, U>>
+    visited: Map<GraphNode<T, U>, GraphNode<T, U>>,
+    target: GraphNode<T, U>
   ) {
     let nextNode = null;
     distances.forEach((value, key) => {
-      if (!visited.has(key)) {
+      if (nextNode?.node[0] === target) {
+        nextNode = null;
+      }
+
+      if (!visited.has(key) && nextNode == null) {
         nextNode = value;
       }
+
+      value.node[0].getAdjacents().forEach(([n]) => {
+        if (nextNode) {
+          return;
+        }
+
+        if (!visited.has(n)) {
+          nextNode = distances.get(n);
+        }
+      });
     });
 
+    if (!nextNode && !visited.has(target)) {
+      console.log('LAST NODE!=');
+      nextNode = distances.get(target);
+    }
+    // debugger;
+    console.log('next node====', nextNode?.node?.[0]?.value?.commonName);
     return nextNode;
   }
 
@@ -119,39 +140,56 @@ export class Graph<T, U> {
 
     parents.set(target, { number: null, node: null });
 
+    //start with starting node, and look at children
     node.getAdjacents().forEach((child) => {
+      //for each child of start node, set the distance as 1 and all of them as parents of start node
       const [distance] = child;
       parents.set(distance, { number: null, node: [node, null] });
       distances.set(distance, { number: 1, node: child });
     });
 
-    let nodeToProcess = this.getNodeNotVisited(distances, visited);
-    console.log('STARTING-------');
+    // find the first node to process. i.e. closest node (all are closest due to no weight)
+    let nodeToProcess = this.getNodeNotVisited(distances, visited, target);
+
     while (nodeToProcess) {
+      // get the weight of node to process
       const distance = distances.get(nodeToProcess.node[0]).number;
 
+      //get all the node's children
       const children = nodeToProcess.node[0].getAdjacents();
 
       children.forEach((c) => {
+        //for each child of a given node, check to see it's not pointing to the start node
         const [child] = c;
         if (!(child === node)) {
+          // new distance is distance from node to node to process + 1
           const newdistance = distance + 1;
 
+          // if the new distance is lower than the distance stored in the child or a distance doesn't exist for that child,
+          // update the distances with the new value and the parent links with the new child
           if (
             !distances.has(child) ||
             distances.get(child).number > newdistance
           ) {
+            if (child.value.commonName === 'Imperial Wharf') {
+              console.log('child----', newdistance);
+            }
             distances.set(child, { number: newdistance, node: c });
             parents.set(child, nodeToProcess);
           }
         }
       });
 
+      //update the list of visited with the processed node
       visited.set(nodeToProcess.node[0], nodeToProcess);
 
-      nodeToProcess = this.getNodeNotVisited(distances, visited);
+      //find the next node to process
+      nodeToProcess = this.getNodeNotVisited(distances, visited, target);
     }
-    console.log('DONE--------------');
+
+    distances.forEach((d, k) =>
+      console.log((k.value as any).commonName, d.number)
+    );
 
     const path = [];
     let parent = parents.get(target);
