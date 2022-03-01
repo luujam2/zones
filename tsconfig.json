@@ -2,10 +2,10 @@
   "compilerOptions": {
     "rootDir": ".",
     "target": "es2019",
-    "lib": ["es2019", "dom"],
+    "lib": ["es2021", "dom"],
     "module": "commonjs",
     "esModuleInterop": true,
-    "strict": false,
+    "strict": true,
     "sourceMap": true,
     "jsx": "react"
   }

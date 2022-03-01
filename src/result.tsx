@@ -2,8 +2,10 @@ import React, { useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { AnimatePresence, motion, useCycle } from 'framer-motion';
 import { colourList } from './utils';
+import { GraphNode } from './node';
+import { Edge, Station } from './app';
 
-const maxJourneyTimes = {
+const maxJourneyTimes: { [key: string]: number[] } = {
   '2-3': [100, 110, 120], //travel between zones 2 and 3
 
   '1': [70, 80, 85], //travel across 1 zone
@@ -60,7 +62,7 @@ const Line = styled.div<{ line: string }>`
   border-left: 12px solid ${(props) => colourList[props.line]};
 `;
 
-const Station = styled.div<{ start: boolean }>`
+const StyledStation = styled.div<{ start: boolean }>`
   align-self: ${(props) => (props.start ? 'flex-end' : 'flex-start')};
   width: 20px;
   height: 20px;
@@ -112,24 +114,14 @@ const variants = {
   },
 };
 
-const Trip = ({
-  start,
-  end,
-  line,
-  stations,
-}: {
-  start: string;
-  end: string;
-  line: keyof typeof colourList;
-  stations: any;
-}) => {
+const Trip = ({ start, end, line, stations }: StationPairs) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
 
   return (
     <Journey>
       <Row>
         <MainName>{start}</MainName>
-        <Station start={true} />
+        <StyledStation start={true} />
       </Row>
       <Row>
         <Name>
@@ -173,15 +165,17 @@ const Trip = ({
         {line === 'osi' ? (
           <DottedLine title={line} />
         ) : (
-          <Line title={line} line={line} />
+          <Line title={line} line={line ?? ''} />
         )}
       </Row>
       <Row>
         <MainName>
           {end}{' '}
-          {pinkReaders.includes(end) && <PinkReader>Pink reader</PinkReader>}
+          {pinkReaders.includes(end ?? '') && (
+            <PinkReader>Pink reader</PinkReader>
+          )}
         </MainName>
-        <Station start={false} />
+        <StyledStation start={false} />
       </Row>
     </Journey>
   );
@@ -223,7 +217,7 @@ const findMaxJourneyTime = (zones: string[]) => {
 
   const currentDate = new Date();
 
-  let journeyTimes = [];
+  let journeyTimes: number[] = [];
   if (highestZone === 3 && lowestZone === 2) {
     journeyTimes = maxJourneyTimes['2-3'];
   } else {
@@ -244,38 +238,61 @@ const findMaxJourneyTime = (zones: string[]) => {
   }
 };
 
-export default ({ result, zoneOneStart, zoneOneEnd }) => {
-  const data = result.map((res) => res.node);
+type ResultProps = {
+  result: (
+    | ({
+        number: number | null;
+      } & {
+        node: [GraphNode<Station, Edge>, Edge | null] | null;
+      })
+    | undefined
+  )[];
+  zoneOneStart: string | null;
+  zoneOneEnd: string | null;
+};
 
-  const findNextChange = (index, currentLine) => {
-    return data.find(([stn, line], i) => {
-      return i > index && currentLine !== data[i + 1]?.[1].line;
+type StationPairs = {
+  start: string | undefined;
+  end: string | undefined;
+  line: string | undefined;
+  stations: GraphNode<Station, Edge>[];
+};
+
+export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
+  const data = result.map((res) => res?.node);
+
+  const findNextChange = (index: number, currentLine: string | undefined) => {
+    return data.find((_, i) => {
+      return i > index && currentLine !== data[i + 1]?.[1]?.line;
     });
   };
 
-  const stationChangePairs = useMemo(
+  const stationChangePairs: StationPairs[] = useMemo(
     () =>
-      data.reduce((acc, [stn, line], index) => {
+      data.reduce<StationPairs[]>((acc, curr, index) => {
+        const stn = curr?.[0];
+        const line = curr?.[1];
         //is station before it a different line?
         //if yes then it is the end of one line and start of the next
         //if station is first then it is the start of the line
-        if (index === data.length - 1) {
+        if (index === data.length - 1 || stn == null) {
           return acc;
         }
 
         const isStationChange =
-          data[index + 1]?.[1].line !== line?.line && index !== data.length - 1;
+          data[index + 1]?.[1]?.line !== line?.line &&
+          index !== data.length - 1;
         if (index === 0 || isStationChange) {
-          const nextChange = findNextChange(index, data[index + 1]?.[1].line);
+          const nextChange = findNextChange(index, data[index + 1]?.[1]?.line);
 
           return [
             ...acc,
             {
-              start: stn.value.commonName,
+              start: stn?.value.commonName,
               end: nextChange?.[0]?.value?.commonName,
-              line: nextChange?.[1].line,
+              line: nextChange?.[1]?.line,
               stations: [],
-            },
+            } as StationPairs,
           ];
         } else {
           acc[acc.length - 1].stations.push(stn);
@@ -285,11 +302,16 @@ export default ({ result, zoneOneStart, zoneOneEnd }) => {
     [result]
   );
 
-  const zones = useMemo(
+  const zones: string[] = useMemo(
     () =>
-      data.reduce((acc, [stn, line], index) => {
-        if (acc[acc.length - 1] !== stn.value.zone) {
-          return [...acc, stn.value.zone];
+      data.reduce<string[]>((acc, curr) => {
+        const stn = curr?.[0];
+
+        if (
+          acc[acc.length - 1] !== stn?.value.zone &&
+          stn?.value.zone != null
+        ) {
+          return [...acc, stn?.value.zone];
         }
 
         return acc;
@@ -302,7 +324,7 @@ export default ({ result, zoneOneStart, zoneOneEnd }) => {
     [zones]
   );
 
-  if (!stationChangePairs.length) {
+  if (!stationChangePairs?.length) {
     return <Row>Journey not possible</Row>;
   }
 

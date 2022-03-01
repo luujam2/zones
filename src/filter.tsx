@@ -37,7 +37,19 @@ const Text = styled.div`
   text-align: center;
 `;
 
-const Line = ({ line, onClick, isFiltered }) => {
+type LineProps = {
+  line: string;
+  onClick: () => void;
+  isFiltered: boolean;
+};
+
+type FilterProps = {
+  lines: string[];
+  setFilter: (items: string[]) => void;
+  filter: string[];
+};
+
+const Line = ({ line, onClick, isFiltered }: LineProps) => {
   return (
     <Item onClick={onClick} isFiltered={isFiltered}>
       <Text>{line}</Text>
@@ -46,7 +58,7 @@ const Line = ({ line, onClick, isFiltered }) => {
   );
 };
 
-export default ({ lines, setFilter, filter }) => {
+export default ({ lines, setFilter, filter }: FilterProps) => {
   return (
     <Container>
       {lines.map((line) => (

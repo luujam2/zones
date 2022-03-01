@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Graph } from './graph';
 import { Edge, nameToMapKey, Station } from './app';
 import Result from './result';
-import useSWR, { Fetcher } from 'swr';
+import useSWR from 'swr';
 import Spinner from './spinner';
 import Input from './input';
 import styled from '@emotion/styled';
-const fetcher = (args) => fetch(args).then((res) => res.json());
+import { GraphNode } from './node';
+
+const fetcher = (args: any) => fetch(args).then((res) => res.json());
 
 const Form = styled.form``;
 
@@ -25,6 +27,10 @@ const CenteredSpin = styled.div`
   justify-content: center;
 `;
 
+type RadiusDataResp = {
+  stopPoints: Station[];
+};
+
 export default ({
   stations,
   london,
@@ -32,16 +38,32 @@ export default ({
 }: {
   stations: Station[];
   london: Graph<Station, Edge>;
-  stationMappings: any;
+  stationMappings: { [key: string]: GraphNode<Station, Edge> };
 }) => {
   const [startStation, setStartStation] = useState('');
   const [endStation, setEndStation] = useState('');
-  const [result, setResult] = useState(null);
-  const [zoneOneStart, setZoneOneStart] = useState(null);
-  const [zoneOneEnd, setZoneOneEnd] = useState(null);
-  const [dijkstraStart, setDijkstraStart] = useState(null);
-  const [dijkstraEnd, setDijkstraEnd] = useState(null);
-  const { data: startData } = useSWR(
+  const [result, setResult] = useState<
+    | (
+        | ({
+            number: number | null;
+          } & {
+            node: [GraphNode<Station, Edge>, Edge | null] | null;
+          })
+        | undefined
+      )[]
+    | null
+  >(null);
+  const [zoneOneStart, setZoneOneStart] = useState<Station | null>(null);
+  const [zoneOneEnd, setZoneOneEnd] = useState<Station | null>(null);
+  const [dijkstraStart, setDijkstraStart] = useState<GraphNode<
+    Station,
+    Edge
+  > | null>(null);
+  const [dijkstraEnd, setDijkstraEnd] = useState<GraphNode<
+    Station,
+    Edge
+  > | null>(null);
+  const { data: startData } = useSWR<RadiusDataResp>(
     () =>
       zoneOneStart
         ? `https://api.tfl.gov.uk/StopPoint/?lat=${zoneOneStart.lat}&lon=${zoneOneStart.lon}&stopTypes=NaptanMetroStation&radius=1500`
@@ -49,7 +71,7 @@ export default ({
     fetcher
   );
 
-  const { data: endData } = useSWR(
+  const { data: endData } = useSWR<RadiusDataResp>(
     () =>
       zoneOneEnd
         ? `https://api.tfl.gov.uk/StopPoint/?lat=${zoneOneEnd.lat}&lon=${zoneOneEnd.lon}&stopTypes=NaptanMetroStation&radius=1500`
@@ -59,7 +81,7 @@ export default ({
 
   // sets the start and end points to closest Z2 station if either are Z1
   useEffect(() => {
-    const getNearestStation = (data, stn) => {
+    const getNearestStation = (data: RadiusDataResp, stn: Station) => {
       const nearestZoneTwo = data.stopPoints.find((sp) => {
         if (!stationMappings[nameToMapKey(sp.commonName)]) {
           return false;
@@ -74,7 +96,7 @@ export default ({
       }
 
       //find closest by euclidean distance
-      const distance = (a, b) => {
+      const distance = (a: Station, b: Station) => {
         return Math.sqrt(
           Math.pow(b.lat - a.lat, 2) + Math.pow(b.lon - a.lon, 2)
         );
@@ -87,12 +109,12 @@ export default ({
       return stationMappings[nameToMapKey(station.commonName)];
     };
 
-    if (startData) {
+    if (startData && zoneOneStart) {
       const closest = getNearestStation(startData, zoneOneStart);
       setDijkstraStart(closest);
     }
 
-    if (endData) {
+    if (endData && zoneOneEnd) {
       const closest = getNearestStation(endData, zoneOneEnd);
       setDijkstraEnd(closest);
     }
@@ -139,8 +161,8 @@ export default ({
           <Input
             id="start-station"
             label="Start station"
-            onChange={(e) => {
-              setZoneOneStart(false);
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setZoneOneStart(null);
               setStartStation(e.target.value);
             }}
           />
@@ -151,7 +173,7 @@ export default ({
             id="end-station"
             label="Destination"
             onChange={(e) => {
-              setZoneOneEnd(false);
+              setZoneOneEnd(null);
               setEndStation(e.target.value);
             }}
           />

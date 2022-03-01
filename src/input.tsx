@@ -5,7 +5,13 @@ const Input = styled.input`
   font-size: 24px;
 `;
 
-export default ({ id, label, onChange }) => {
+type InputProps = {
+  id: string;
+  label: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export default ({ id, label, onChange }: InputProps) => {
   return (
     <div>
       <label htmlFor={id}>{label}</label>

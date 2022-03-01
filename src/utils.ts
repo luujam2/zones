@@ -1,4 +1,4 @@
-export const colourList = {
+export const colourList: { [key: string]: string } = {
   jubilee: '#A0A5A9',
   central: '#E32017',
   victoria: '#0098D4',

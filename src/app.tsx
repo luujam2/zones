@@ -5,18 +5,27 @@ import { Graph, GraphDir } from './graph';
 
 import Filter from './filter';
 import Search from './search';
+import { GraphNode } from './node';
 
 export type Station = {
   commonName: string;
   modes: string[];
   zone: string;
+  lat: number;
+  lon: number;
 };
 
 export type Edge = {
   line: string;
 };
 
-export const nameToMapKey = (commonName) => {
+type Connections = {
+  [key: string]: {
+    connections: { name: string; line: string }[];
+  };
+};
+
+export const nameToMapKey = (commonName: string) => {
   return commonName
     .replace('Rail', '')
     .replace('Station', '')
@@ -41,13 +50,14 @@ export const nameToMapKey = (commonName) => {
 };
 
 export default () => {
-  const [filter, setFilter] = useState([]);
+  const [filter, setFilter] = useState<string[]>([]);
   const [london, setLondon] = useState<Graph<Station, Edge>>();
-  const [stationMappings, setStationMappings] = useState<any>();
+  const [stationMappings, setStationMappings] =
+    useState<{ [key: string]: GraphNode<Station, Edge> }>();
 
   useEffect(() => {
     const lond = new Graph<Station, Edge>(GraphDir.DIRECTED);
-    const mappings = {};
+    const mappings: { [key: string]: GraphNode<Station, Edge> } = {};
     console.log('filter', filter);
     // generate nodes for for all stations
     stations.forEach((station) => {
@@ -61,7 +71,7 @@ export default () => {
 
     stations.forEach((station) => {
       const commonName = nameToMapKey(station.commonName);
-      const links = connections[commonName]?.connections;
+      const links = (connections as Connections)[commonName]?.connections;
 
       if (links) {
         links.forEach((link) => {
@@ -81,6 +91,10 @@ export default () => {
     setLondon(lond);
     setStationMappings(mappings);
   }, [filter]);
+
+  if (!london || !stationMappings) {
+    return <div>error</div>;
+  }
 
   return (
     <>

@@ -1,4 +1,4 @@
-module.exports = [
+export default [
   {
     commonName: 'Abbey Road',
     modes: ['dlr'],
