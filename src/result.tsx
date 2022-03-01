@@ -1,6 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import styled from '@emotion/styled';
 import { AnimatePresence, motion, useCycle } from 'framer-motion';
+import { colourList } from './utils';
 
 const maxJourneyTimes = {
   '2-3': [100, 110, 120], //travel between zones 2 and 3
@@ -14,22 +15,6 @@ const maxJourneyTimes = {
   '7': [130, 145, 160],
   '8': [140, 155, 170],
   '9': [150, 165, 180],
-};
-
-const colourList = {
-  jubilee: '#A0A5A9',
-  central: '#E32017',
-  victoria: '#0098D4',
-  picadilly: '#003688',
-  district: '#00782A',
-  circle: '#FFD300',
-  metropolitan: '#9B0056',
-  hammersmith: '#F3A9BB',
-  overground: '#EE7C0E',
-  dlr: '#00A4A7',
-  bakerloo: '#B36305',
-  northern: '#000000',
-  osi: 'no',
 };
 
 const pinkReaders = [
@@ -101,6 +86,7 @@ const Stop = styled.div`
 `;
 
 const PinkReader = styled.span`
+  display: inline-block;
   border: 1px solid pink;
   background-color: yellow;
   color: blue;
@@ -244,8 +230,6 @@ const findMaxJourneyTime = (zones: string[]) => {
     journeyTimes = maxJourneyTimes[`${zonesCrossed.length}`];
   }
 
-  console.log(journeyTimes);
-
   switch (currentDate.getDay()) {
     case 0: //sunday
       return journeyTimes[2];
@@ -317,15 +301,22 @@ export default ({ result, zoneOneStart, zoneOneEnd }) => {
     () => findMaxJourneyTime(zones),
     [zones]
   );
+
+  if (!stationChangePairs.length) {
+    return <Row>Journey not possible</Row>;
+  }
+
   return (
     <>
-      <div>{data.length}</div>
-      <div>
-        Max journey time allowed:{' '}
-        {`${Math.floor(maxJourneyTime / 60)} hours ${
-          maxJourneyTime % 60
-        } minutes`}
-      </div>
+      <p>
+        <Row>{data.length} stops</Row>
+        <Row>
+          Max journey time allowed:{' '}
+          {`${Math.floor(maxJourneyTime / 60)} hours ${
+            maxJourneyTime % 60
+          } minutes`}
+        </Row>
+      </p>
       {zoneOneStart && <ZoneOne>Walk from {zoneOneStart}</ZoneOne>}
       {stationChangePairs.map((pairs, index) => {
         return <Trip key={index} {...pairs} />;

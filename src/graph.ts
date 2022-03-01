@@ -36,56 +36,11 @@ export class Graph<T, U> {
     }
   }
 
-  // dfs(first: GraphNode<T, U>, target: GraphNode<T, U>) {
-  //   const path = [];
-  //   const visited = new Map();
-  //   const stack = [];
-  //   const result = this.searchTree(first, target, path, visited, stack);
-
-  //   console.log('result---', result);
-  //   return result;
-  // }
-
-  // searchTree(
-  //   node: GraphNode<T, U>,
-  //   target: GraphNode<T, U>,
-  //   path,
-  //   visited,
-  //   stack
-  // ) {
-  //   path.push(node);
-  //   visited.set(node, [node]);
-  //   //node found return accumulated path
-  //   if (node === target) {
-  //     return path;
-  //   }
-
-  //   // node not found, traverse adjacent nodes
-  //   node.getAdjacents().forEach(([node, weight]) => {
-  //     if (!visited.has(node)) {
-  //       if (node.value == null) {
-  //         console.log('error!-----', node);
-  //       }
-  //       stack.push([node, weight]);
-  //     }
-  //   });
-
-  //   if (isNodeExplored(node, visited)) {
-  //     // if all the adjacents have been visited then the path should be cleaned up
-  //     while (
-  //       path.length > 0 &&
-  //       isNodeExplored(path[path.length - 1], visited)
-  //     ) {
-  //       path.pop();
-  //     }
-  //   }
-
-  //   if (stack.length) {
-  //     //carry on with traversal
-  //     const [n] = stack.pop();
-  //     return this.searchTree(n, target, path, visited, stack);
-  //   }
-  // }
+  removeEdge(edge: [GraphNode<T, U>, U]) {
+    this.nodes.forEach((node) => {
+      node.removeAdjacent(edge);
+    });
+  }
 
   getNodeNotVisited(
     distances: Map<
@@ -117,11 +72,8 @@ export class Graph<T, U> {
     });
 
     if (!nextNode && !visited.has(target)) {
-      console.log('LAST NODE!=');
       nextNode = distances.get(target);
     }
-    // debugger;
-    console.log('next node====', nextNode?.node?.[0]?.value?.commonName);
     return nextNode;
   }
 
@@ -171,9 +123,6 @@ export class Graph<T, U> {
             !distances.has(child) ||
             distances.get(child).number > newdistance
           ) {
-            if (child.value.commonName === 'Imperial Wharf') {
-              console.log('child----', newdistance);
-            }
             distances.set(child, { number: newdistance, node: c });
             parents.set(child, nodeToProcess);
           }
@@ -186,10 +135,6 @@ export class Graph<T, U> {
       //find the next node to process
       nodeToProcess = this.getNodeNotVisited(distances, visited, target);
     }
-
-    distances.forEach((d, k) =>
-      console.log((k.value as any).commonName, d.number)
-    );
 
     const path = [];
     let parent = parents.get(target);
@@ -204,14 +149,4 @@ export class Graph<T, U> {
     }
     return path.reverse();
   }
-}
-
-function isNodeExplored(node, visited) {
-  return node.getAdjacents().reduce((acc, [curr]) => {
-    if (!visited.has(curr)) {
-      return false;
-    }
-
-    return acc;
-  }, true);
 }
