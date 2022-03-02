@@ -19,7 +19,7 @@ export type Edge = {
   line: string;
 };
 
-type Connections = {
+export type Connections = {
   [key: string]: {
     connections: { name: string; line: string }[];
   };
