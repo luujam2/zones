@@ -48105,13 +48105,6 @@ const Item = styled_1.default.div `
   height: 75px;
   background-color: ${(props) => (props.isFiltered ? 'grey' : 'white')};
   color: ${(props) => (props.isFiltered ? 'white' : 'black')};
-
-  @media (hover: hover) {
-    &:hover {
-      background-color: ${(props) => (props.isFiltered ? 'white' : 'grey')};
-      color: ${(props) => (props.isFiltered ? 'black' : 'white')};
-    }
-  }
 `;
 const Colour = styled_1.default.div `
   background-color: ${(props) => (props.isFiltered ? 'grey' : props.colour)};
