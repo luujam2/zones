@@ -20,9 +20,11 @@ const Item = styled.div<{ isFiltered: boolean }>`
   background-color: ${(props) => (props.isFiltered ? 'grey' : 'white')};
   color: ${(props) => (props.isFiltered ? 'white' : 'black')};
 
-  &:hover {
-    background-color: ${(props) => (props.isFiltered ? 'white' : 'grey')};
-    color: ${(props) => (props.isFiltered ? 'black' : 'white')};
+  @media (hover: hover) {
+    &:hover {
+      background-color: ${(props) => (props.isFiltered ? 'white' : 'grey')};
+      color: ${(props) => (props.isFiltered ? 'black' : 'white')};
+    }
   }
 `;
 
