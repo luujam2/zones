@@ -9,9 +9,10 @@ type InputProps = {
   id: string;
   label: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  value: string | undefined;
 };
 
-export default ({ id, label, onChange }: InputProps) => {
+export default ({ id, label, onChange, value }: InputProps) => {
   return (
     <div>
       <label htmlFor={id}>{label}</label>
@@ -23,6 +24,7 @@ export default ({ id, label, onChange }: InputProps) => {
           onChange={(e) => {
             onChange(e);
           }}
+          value={value}
         />
       </div>
     </div>

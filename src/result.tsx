@@ -1,9 +1,9 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { AnimatePresence, motion, useCycle } from 'framer-motion';
 import { colourList } from './utils';
-import { GraphNode } from './node';
-import { Edge, Station } from './app';
+import { Station } from './app';
+import { PathResp } from '../pages/api/path';
 
 const maxJourneyTimes: { [key: string]: number[] } = {
   '2-3': [100, 110, 120], //travel between zones 2 and 3
@@ -152,9 +152,7 @@ const Trip = ({ start, end, line, stations }: StationPairs) => {
                     }}
                   >
                     {stations.map((stn) => (
-                      <Stop key={stn.value.commonName}>
-                        {stn.value.commonName}
-                      </Stop>
+                      <Stop key={stn.commonName}>{stn.commonName}</Stop>
                     ))}
                   </motion.div>
                 )}
@@ -239,39 +237,32 @@ const findMaxJourneyTime = (zones: string[]) => {
 };
 
 type ResultProps = {
-  result: (
-    | ({
-        number: number | null;
-      } & {
-        node: [GraphNode<Station, Edge>, Edge | null] | null;
-      })
-    | undefined
-  )[];
-  zoneOneStart: string | null;
-  zoneOneEnd: string | null;
+  result: PathResp[];
+  zoneOneStart: string | null | undefined;
+  zoneOneEnd: string | null | undefined;
 };
 
 type StationPairs = {
   start: string | undefined;
   end: string | undefined;
   line: string | undefined;
-  stations: GraphNode<Station, Edge>[];
+  stations: Station[];
 };
 
 export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
-  const data = result.map((res) => res?.node);
+  const data = result.map((res) => res);
 
   const findNextChange = (index: number, currentLine: string | undefined) => {
     return data.find((_, i) => {
-      return i > index && currentLine !== data[i + 1]?.[1]?.line;
+      return i > index && currentLine !== data[i + 1]?.line;
     });
   };
 
   const stationChangePairs: StationPairs[] = useMemo(
     () =>
       data.reduce<StationPairs[]>((acc, curr, index) => {
-        const stn = curr?.[0];
-        const line = curr?.[1];
+        const stn = curr?.value;
+        const line = curr?.line;
         //is station before it a different line?
         //if yes then it is the end of one line and start of the next
         //if station is first then it is the start of the line
@@ -280,17 +271,16 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
         }
 
         const isStationChange =
-          data[index + 1]?.[1]?.line !== line?.line &&
-          index !== data.length - 1;
+          data[index + 1]?.line !== line && index !== data.length - 1;
         if (index === 0 || isStationChange) {
-          const nextChange = findNextChange(index, data[index + 1]?.[1]?.line);
+          const nextChange = findNextChange(index, data[index + 1]?.line);
 
           return [
             ...acc,
             {
-              start: stn?.value.commonName,
-              end: nextChange?.[0]?.value?.commonName,
-              line: nextChange?.[1]?.line,
+              start: stn?.commonName,
+              end: nextChange?.value?.commonName,
+              line: nextChange?.line,
               stations: [],
             } as StationPairs,
           ];
@@ -305,13 +295,10 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
   const zones: string[] = useMemo(
     () =>
       data.reduce<string[]>((acc, curr) => {
-        const stn = curr?.[0];
+        const stn = curr?.value;
 
-        if (
-          acc[acc.length - 1] !== stn?.value.zone &&
-          stn?.value.zone != null
-        ) {
-          return [...acc, stn?.value.zone];
+        if (acc[acc.length - 1] !== stn?.zone && stn?.zone != null) {
+          return [...acc, stn?.zone];
         }
 
         return acc;

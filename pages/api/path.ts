@@ -9,8 +9,13 @@ type Data = {
   name: string;
 };
 
-type RadiusDataResp = {
+export type RadiusDataResp = {
   stopPoints: Station[];
+};
+
+export type PathResp = {
+  value: Station | undefined;
+  line: string | undefined;
 };
 
 const nameToMapKey = (commonName: string) => {
@@ -39,7 +44,7 @@ const nameToMapKey = (commonName: string) => {
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse<PathResp[] | string>
 ) {
   const start = req.query.start;
   const end = req.query.end;
@@ -155,5 +160,6 @@ export default async function handler(
 
     return res.status(200).json(Array.from(results));
   }
-  res.status(200).json({ name: 'John Doe' });
+
+  return res.status(400).send('invalid params');
 }

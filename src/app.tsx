@@ -1,11 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import stations from '../data/stations';
-import connections from '../data/connections';
-import { Graph, GraphDir } from './graph';
 
+import useSWR from 'swr';
 import Filter from './filter';
 import Search from './search';
-import { GraphNode } from './node';
+import { PathResp } from '../pages/api/path';
+import styled from '@emotion/styled';
+import Spinner from './spinner';
+import Result from './result';
+
+const fetcher = (args: any) => fetch(args).then((res) => res.json());
+
+const CenteredSpin = styled.div`
+  display: flex;
+  justify-content: center;
+`;
 
 export type Station = {
   commonName: string;
@@ -25,77 +34,30 @@ export type Connections = {
   };
 };
 
-export const nameToMapKey = (commonName: string) => {
-  return commonName
-    .replace('Rail', '')
-    .replace('Station', '')
-    .replace('Underground', '')
-    .replace('DLR', '')
-    .replace('Dlr', '')
-    .replace(/\(.+\)/, '')
-    .replace('Stn / H&C and Circle Lines', '')
-    .replace('Stn', '')
-    .replace('St.', 'St')
-    .replace("s's", 's')
-    .replace('Shepherds', "Shepherd's")
-    .replace('Paddington - ', 'Paddington')
-    .replace('Queens Park', "Queen's Park")
-    .replace('StPancras', 'St Pancras')
-    .toLowerCase()
-    .replaceAll(' ', '')
-    .replaceAll('&', '')
-    .replaceAll('-', '')
-    .replaceAll("'", '')
-    .trim();
-};
+const validStations = stations.map((stn) => stn.commonName);
 
 export default () => {
   const [filter, setFilter] = useState<string[]>([]);
-  const [london, setLondon] = useState<Graph<Station, Edge>>();
-  const [stationMappings, setStationMappings] =
-    useState<{ [key: string]: GraphNode<Station, Edge> }>();
+  const [start, setStart] = useState<string>();
+  const [end, setEnd] = useState<string>();
+  const [shouldFetch, setShouldFetch] = useState(false);
 
-  useEffect(() => {
-    const lond = new Graph<Station, Edge>(GraphDir.DIRECTED);
-    const mappings: { [key: string]: GraphNode<Station, Edge> } = {};
-    console.log('filter', filter);
-    // generate nodes for for all stations
-    stations.forEach((station) => {
-      const commonName = nameToMapKey(station.commonName);
+  const shouldFetchData =
+    shouldFetch &&
+    start &&
+    end &&
+    validStations.includes(start) &&
+    validStations.includes(end);
 
-      //add to graph
-      const vertex = lond.addVertex(station);
-
-      mappings[commonName] = vertex;
-    });
-
-    stations.forEach((station) => {
-      const commonName = nameToMapKey(station.commonName);
-      const links = (connections as Connections)[commonName]?.connections;
-
-      if (links) {
-        links.forEach((link) => {
-          if (!filter.includes(link.line)) {
-            lond.addEdge(
-              mappings[commonName].value,
-              mappings[link.name].value,
-              {
-                line: link.line,
-              }
-            );
-          }
-        });
-      }
-    });
-    console.log('updating london', lond);
-    setLondon(lond);
-    setStationMappings(mappings);
-  }, [filter]);
-
-  if (!london || !stationMappings) {
-    return <div>error</div>;
-  }
-
+  const { data: results } = useSWR<PathResp[]>(
+    () =>
+      shouldFetchData
+        ? `/api/path?start=${start}&end=${end}${
+            filter.length ? `&filter=${filter.join(',')}` : ''
+          }`
+        : null,
+    fetcher
+  );
   return (
     <>
       <Filter
@@ -118,9 +80,36 @@ export default () => {
       />
       <Search
         stations={stations}
-        london={london}
-        stationMappings={stationMappings}
+        start={start}
+        end={end}
+        setStart={setStart}
+        setEnd={setEnd}
+        setShouldFetch={setShouldFetch}
       />
+
+      {results === undefined && shouldFetchData ? (
+        <CenteredSpin>
+          <Spinner />
+        </CenteredSpin>
+      ) : (
+        results && (
+          <div style={{ display: 'flex' }}>
+            <div style={{ flex: '50% 1 1' }}>
+              <Result
+                result={results}
+                zoneOneStart={
+                  results[0]?.value?.commonName !== start ? start : null
+                }
+                zoneOneEnd={
+                  results[results.length - 1]?.value?.commonName !== end
+                    ? end
+                    : null
+                }
+              />
+            </div>
+          </div>
+        )
+      )}
     </>
   );
 };
