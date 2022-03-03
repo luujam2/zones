@@ -13,11 +13,11 @@ export default {
   },
   actontown: {
     connections: [
-      { name: 'ealingcommon', line: 'picadilly' },
+      { name: 'ealingcommon', line: 'piccadilly' },
       { name: 'ealingcommon', line: 'district' },
-      { name: 'southealing', line: 'picadilly' },
+      { name: 'southealing', line: 'piccadilly' },
       { name: 'chiswickpark', line: 'district' },
-      { name: 'turnhamgreen', line: 'picadilly' },
+      { name: 'turnhamgreen', line: 'piccadilly' },
     ],
   },
   allsaints: {
@@ -28,8 +28,8 @@ export default {
   },
   alperton: {
     connections: [
-      { name: 'sudburytown', line: 'picadilly' },
-      { name: 'parkroyal', line: 'picadilly' },
+      { name: 'sudburytown', line: 'piccadilly' },
+      { name: 'parkroyal', line: 'piccadilly' },
     ],
   },
   amersham: {
@@ -49,14 +49,14 @@ export default {
   },
   arnosgrove: {
     connections: [
-      { name: 'southgate', line: 'picadilly' },
-      { name: 'boundsgreen', line: 'picadilly' },
+      { name: 'southgate', line: 'piccadilly' },
+      { name: 'boundsgreen', line: 'piccadilly' },
     ],
   },
   arsenal: {
     connections: [
-      { name: 'finsburypark', line: 'picadilly' },
-      { name: 'hollowayroad', line: 'picadilly' },
+      { name: 'finsburypark', line: 'piccadilly' },
+      { name: 'hollowayroad', line: 'piccadilly' },
     ],
   },
   balham: {
@@ -81,8 +81,8 @@ export default {
   },
   baronscourt: {
     connections: [
-      { name: 'hammersmith', line: 'picadilly' },
-      { name: 'earlscourt', line: 'picadilly' },
+      { name: 'hammersmith', line: 'piccadilly' },
+      { name: 'earlscourt', line: 'piccadilly' },
     ],
   },
   beckton: { connections: [{ name: 'gallionsreach', line: 'dlr' }] },
@@ -122,14 +122,14 @@ export default {
   },
   bostonmanor: {
     connections: [
-      { name: 'osterley', line: 'picadilly' },
-      { name: 'northfields', line: 'picadilly' },
+      { name: 'osterley', line: 'piccadilly' },
+      { name: 'northfields', line: 'piccadilly' },
     ],
   },
   boundsgreen: {
     connections: [
-      { name: 'woodgreen', line: 'picadilly' },
-      { name: 'arnosgrove', line: 'picadilly' },
+      { name: 'woodgreen', line: 'piccadilly' },
+      { name: 'arnosgrove', line: 'piccadilly' },
     ],
   },
   bowchurch: {
@@ -213,7 +213,7 @@ export default {
   },
   caledonianroad: {
     connections: [
-      { name: 'hollowayroad', line: 'picadilly' },
+      { name: 'hollowayroad', line: 'piccadilly' },
       { name: 'caledonianroadbarnsbury', line: 'osi' },
     ],
   },
@@ -367,7 +367,7 @@ export default {
     ],
   },
   cockfosters: {
-    connections: [{ name: 'oakwood', line: 'picadilly' }],
+    connections: [{ name: 'oakwood', line: 'piccadilly' }],
   },
   colindale: {
     connections: [
@@ -485,8 +485,8 @@ export default {
   ealingcommon: {
     connections: [
       { name: 'ealingbroadway', line: 'district' },
-      { name: 'northealing', line: 'picadilly' },
-      { name: 'actontown', line: 'picadilly' },
+      { name: 'northealing', line: 'piccadilly' },
+      { name: 'actontown', line: 'piccadilly' },
       { name: 'northealing', line: 'district' },
     ],
   },
@@ -495,7 +495,7 @@ export default {
       { name: 'kensingtonolympia', line: 'osi' },
       { name: 'westbrompton', line: 'district' },
       { name: 'westkensington', line: 'district' },
-      { name: 'baronscourt', line: 'picadilly' },
+      { name: 'baronscourt', line: 'piccadilly' },
       { name: 'nottinghillgate', line: 'district' },
     ],
   },
@@ -535,8 +535,8 @@ export default {
     connections: [
       { name: 'ruislipmanor', line: 'metropolitan' },
       { name: 'ruislipmanor', line: 'metropolitan' },
-      { name: 'raynerslane', line: 'picadilly' },
-      { name: 'raynerslane', line: 'picadilly' },
+      { name: 'raynerslane', line: 'piccadilly' },
+      { name: 'raynerslane', line: 'piccadilly' },
     ],
   },
   edgware: {
@@ -546,7 +546,7 @@ export default {
     connections: [
       { name: 'southbury', line: 'overground' },
       { name: 'bushhillpark', line: 'overground' },
-      { name: 'silverstreet', line: 'picadilly' },
+      { name: 'silverstreet', line: 'piccadilly' },
     ],
   },
   elephantcastle: {
@@ -604,9 +604,9 @@ export default {
   },
   finsburypark: {
     connections: [
-      { name: 'manorhouse', line: 'picadilly' },
+      { name: 'manorhouse', line: 'piccadilly' },
       { name: 'sevensisters', line: 'victoria' },
-      { name: 'arsenal', line: 'picadilly' },
+      { name: 'arsenal', line: 'piccadilly' },
       { name: 'highburyislington', line: 'victoria' },
     ],
   },
@@ -718,8 +718,8 @@ export default {
     connections: [
       { name: 'goldhawkroad', line: 'circle' },
       { name: 'goldhawkroad', line: 'hammersmith' },
-      { name: 'baronscourt', line: 'picadilly' },
-      { name: 'turnhamgreen', line: 'picadilly' },
+      { name: 'baronscourt', line: 'piccadilly' },
+      { name: 'turnhamgreen', line: 'piccadilly' },
       { name: 'ravenscourtpark', line: 'district' },
       { name: 'baronscourt', line: 'district' },
     ],
@@ -780,8 +780,8 @@ export default {
   },
   hattoncross: {
     connections: [
-      { name: 'heathrowterminal4', line: 'picadilly' },
-      { name: 'hounslowwest', line: 'picadilly' },
+      { name: 'heathrowterminal4', line: 'piccadilly' },
+      { name: 'hounslowwest', line: 'piccadilly' },
     ],
   },
   headstonelane: {
@@ -791,13 +791,13 @@ export default {
     ],
   },
   heathrowterminal4: {
-    connections: [{ name: 'heathrowterminal5', line: 'picadilly' }],
+    connections: [{ name: 'heathrowterminal5', line: 'piccadilly' }],
   },
   heathrowterminal5: {
-    connections: [{ name: 'heathrowterminals123', line: 'picadilly' }],
+    connections: [{ name: 'heathrowterminals123', line: 'piccadilly' }],
   },
   heathrowterminals123: {
-    connections: [{ name: 'hattoncross', line: 'picadilly' }],
+    connections: [{ name: 'hattoncross', line: 'piccadilly' }],
   },
   hendoncentral: {
     connections: [
@@ -837,9 +837,9 @@ export default {
   hillingdon: {
     connections: [
       { name: 'uxbridge', line: 'metropolitan' },
-      { name: 'uxbridge', line: 'picadilly' },
+      { name: 'uxbridge', line: 'piccadilly' },
       { name: 'ickenham', line: 'metropolitan' },
-      { name: 'ickenham', line: 'picadilly' },
+      { name: 'ickenham', line: 'piccadilly' },
     ],
   },
   hollandpark: {
@@ -850,8 +850,8 @@ export default {
   },
   hollowayroad: {
     connections: [
-      { name: 'caledonianroad', line: 'picadilly' },
-      { name: 'arsenal', line: 'picadilly' },
+      { name: 'caledonianroad', line: 'piccadilly' },
+      { name: 'arsenal', line: 'piccadilly' },
     ],
   },
   homerton: {
@@ -874,27 +874,27 @@ export default {
   },
   hounslowcentral: {
     connections: [
-      { name: 'hounsloweast', line: 'picadilly' },
-      { name: 'hounslowwest', line: 'picadilly' },
+      { name: 'hounsloweast', line: 'piccadilly' },
+      { name: 'hounslowwest', line: 'piccadilly' },
     ],
   },
   hounsloweast: {
     connections: [
-      { name: 'osterley', line: 'picadilly' },
-      { name: 'hounslowcentral', line: 'picadilly' },
+      { name: 'osterley', line: 'piccadilly' },
+      { name: 'hounslowcentral', line: 'piccadilly' },
     ],
   },
   hounslowwest: {
     connections: [
-      { name: 'hattoncross', line: 'picadilly' },
-      { name: 'hounslowcentral', line: 'picadilly' },
+      { name: 'hattoncross', line: 'piccadilly' },
+      { name: 'hounslowcentral', line: 'piccadilly' },
     ],
   },
   hoxton: { connections: [{ name: 'haggerston', line: 'overground' }] },
   ickenham: {
     connections: [
-      { name: 'hillingdon', line: 'picadilly' },
-      { name: 'hillingdon', line: 'picadilly' },
+      { name: 'hillingdon', line: 'piccadilly' },
+      { name: 'hillingdon', line: 'piccadilly' },
       { name: 'ruislip', line: 'metropolitan' },
       { name: 'ruislip', line: 'metropolitan' },
     ],
@@ -1079,8 +1079,8 @@ export default {
   },
   manorhouse: {
     connections: [
-      { name: 'turnpikelane', line: 'picadilly' },
-      { name: 'arsenal', line: 'picadilly' },
+      { name: 'turnpikelane', line: 'piccadilly' },
+      { name: 'arsenal', line: 'piccadilly' },
       { name: 'harringaygreenlanes', line: 'osi' },
     ],
   },
@@ -1150,8 +1150,8 @@ export default {
   },
   northealing: {
     connections: [
-      { name: 'ealingcommon', line: 'picadilly' },
-      { name: 'parkroyal', line: 'picadilly' },
+      { name: 'ealingcommon', line: 'piccadilly' },
+      { name: 'parkroyal', line: 'piccadilly' },
     ],
   },
   northgreenwich: {
@@ -1176,8 +1176,8 @@ export default {
   },
   northfields: {
     connections: [
-      { name: 'southealing', line: 'picadilly' },
-      { name: 'bostonmanor', line: 'picadilly' },
+      { name: 'southealing', line: 'piccadilly' },
+      { name: 'bostonmanor', line: 'piccadilly' },
     ],
   },
   northolt: {
@@ -1216,14 +1216,14 @@ export default {
   },
   oakwood: {
     connections: [
-      { name: 'cockfosters', line: 'picadilly' },
-      { name: 'southgate', line: 'picadilly' },
+      { name: 'cockfosters', line: 'piccadilly' },
+      { name: 'southgate', line: 'piccadilly' },
     ],
   },
   osterley: {
     connections: [
-      { name: 'bostonmanor', line: 'picadilly' },
-      { name: 'hounsloweast', line: 'picadilly' },
+      { name: 'bostonmanor', line: 'piccadilly' },
+      { name: 'hounsloweast', line: 'piccadilly' },
     ],
   },
   oval: {
@@ -1234,8 +1234,8 @@ export default {
   },
   parkroyal: {
     connections: [
-      { name: 'alperton', line: 'picadilly' },
-      { name: 'northealing', line: 'picadilly' },
+      { name: 'alperton', line: 'piccadilly' },
+      { name: 'northealing', line: 'piccadilly' },
       { name: 'hangerlane', line: 'osi' },
     ],
   },
@@ -1344,9 +1344,9 @@ export default {
   raynerslane: {
     connections: [
       { name: 'eastcote', line: 'metropolitan' },
-      { name: 'eastcote', line: 'picadilly' },
+      { name: 'eastcote', line: 'piccadilly' },
       { name: 'westharrow', line: 'metropolitan' },
-      { name: 'southharrow', line: 'picadilly' },
+      { name: 'southharrow', line: 'piccadilly' },
     ],
   },
   rectoryroad: {
@@ -1409,9 +1409,9 @@ export default {
   ruislip: {
     connections: [
       { name: 'ruislipmanor', line: 'metropolitan' },
-      { name: 'ruislipmanor', line: 'picadilly' },
+      { name: 'ruislipmanor', line: 'piccadilly' },
       { name: 'ickenham', line: 'metropolitan' },
-      { name: 'ickenham', line: 'picadilly' },
+      { name: 'ickenham', line: 'piccadilly' },
     ],
   },
   ruislipgardens: {
@@ -1423,9 +1423,9 @@ export default {
   ruislipmanor: {
     connections: [
       { name: 'ruislip', line: 'metropolitan' },
-      { name: 'ruislip', line: 'picadilly' },
+      { name: 'ruislip', line: 'piccadilly' },
       { name: 'eastcote', line: 'metropolitan' },
-      { name: 'eastcote', line: 'picadilly' },
+      { name: 'eastcote', line: 'piccadilly' },
     ],
   },
   sevensisters: {
@@ -1480,8 +1480,8 @@ export default {
   },
   southealing: {
     connections: [
-      { name: 'actontown', line: 'picadilly' },
-      { name: 'northfields', line: 'picadilly' },
+      { name: 'actontown', line: 'piccadilly' },
+      { name: 'northfields', line: 'piccadilly' },
     ],
   },
   southhampstead: {
@@ -1492,8 +1492,8 @@ export default {
   },
   southharrow: {
     connections: [
-      { name: 'sudburyhill', line: 'picadilly' },
-      { name: 'raynerslane', line: 'picadilly' },
+      { name: 'sudburyhill', line: 'piccadilly' },
+      { name: 'raynerslane', line: 'piccadilly' },
     ],
   },
   southkenton: {
@@ -1549,8 +1549,8 @@ export default {
   },
   southgate: {
     connections: [
-      { name: 'oakwood', line: 'picadilly' },
-      { name: 'arnosgrove', line: 'picadilly' },
+      { name: 'oakwood', line: 'piccadilly' },
+      { name: 'arnosgrove', line: 'piccadilly' },
     ],
   },
   stjamesstreet: {
@@ -1632,14 +1632,14 @@ export default {
   },
   sudburyhill: {
     connections: [
-      { name: 'sudburytown', line: 'picadilly' },
-      { name: 'southharrow', line: 'picadilly' },
+      { name: 'sudburytown', line: 'piccadilly' },
+      { name: 'southharrow', line: 'piccadilly' },
     ],
   },
   sudburytown: {
     connections: [
-      { name: 'sudburyhill', line: 'picadilly' },
-      { name: 'alperton', line: 'picadilly' },
+      { name: 'sudburyhill', line: 'piccadilly' },
+      { name: 'alperton', line: 'piccadilly' },
     ],
   },
   surreyquays: {
@@ -1719,8 +1719,8 @@ export default {
   },
   turnpikelane: {
     connections: [
-      { name: 'manorhouse', line: 'picadilly' },
-      { name: 'woodgreen', line: 'picadilly' },
+      { name: 'manorhouse', line: 'piccadilly' },
+      { name: 'woodgreen', line: 'piccadilly' },
     ],
   },
   upminster: {
@@ -1756,7 +1756,7 @@ export default {
   uxbridge: {
     connections: [
       { name: 'hillingdon', line: 'metropolitan' },
-      { name: 'hillingdon', line: 'picadilly' },
+      { name: 'hillingdon', line: 'piccadilly' },
     ],
   },
   vauxhall: {
@@ -1958,8 +1958,8 @@ export default {
   },
   woodgreen: {
     connections: [
-      { name: 'boundsgreen', line: 'picadilly' },
-      { name: 'turnpikelane', line: 'picadilly' },
+      { name: 'boundsgreen', line: 'piccadilly' },
+      { name: 'turnpikelane', line: 'piccadilly' },
     ],
   },
   woodlane: {

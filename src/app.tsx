@@ -64,7 +64,7 @@ export default () => {
         lines={[
           'dlr',
           'overground',
-          'picadilly',
+          'piccadilly',
           'district',
           'metropolitan',
           'northern',
