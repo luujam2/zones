@@ -129,7 +129,7 @@ const Trip = ({ start, end, line, stations }: StationPairs) => {
             <sub>Out of station interchange</sub>
           ) : (
             <>
-              {stations.length > 1 ? (
+              {stations.length > 0 ? (
                 <button onClick={() => toggleOpen()}>
                   <sub>
                     {isOpen ? 'Hide' : 'See'} {`stops (${stations.length})`}

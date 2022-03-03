@@ -49,7 +49,7 @@ export default () => {
     validStations.includes(start) &&
     validStations.includes(end);
 
-  const { data: results } = useSWR<PathResp[]>(
+  const { data: results, error } = useSWR<PathResp[]>(
     () =>
       shouldFetchData
         ? `/api/path?start=${nameToMapKey(start)}&end=${nameToMapKey(end)}${
@@ -87,12 +87,14 @@ export default () => {
         setShouldFetch={setShouldFetch}
       />
 
-      {results === undefined && shouldFetchData ? (
+      {error && <div>Unable to complete request</div>}
+      {results === undefined && shouldFetchData && !error ? (
         <CenteredSpin>
           <Spinner />
         </CenteredSpin>
       ) : (
-        results && (
+        results &&
+        !error && (
           <div style={{ display: 'flex' }}>
             <div style={{ flex: '50% 1 1' }}>
               <Result
