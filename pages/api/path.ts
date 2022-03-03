@@ -35,10 +35,10 @@ const nameToMapKey = (commonName: string) => {
     .replace('Queens Park', "Queen's Park")
     .replace('StPancras', 'St Pancras')
     .toLowerCase()
-    .replaceAll(' ', '')
-    .replaceAll('&', '')
-    .replaceAll('-', '')
-    .replaceAll("'", '')
+    .replace(/\s+/g, '')
+    .replace(/&/g, '')
+    .replace(/-/g, '')
+    .replace(/'/g, '')
     .trim();
 };
 
