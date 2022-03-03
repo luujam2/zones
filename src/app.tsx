@@ -4,7 +4,7 @@ import stations from '../data/stations';
 import useSWR from 'swr';
 import Filter from './filter';
 import Search from './search';
-import { PathResp } from '../pages/api/path';
+import { nameToMapKey, PathResp } from '../pages/api/path';
 import styled from '@emotion/styled';
 import Spinner from './spinner';
 import Result from './result';
@@ -52,7 +52,7 @@ export default () => {
   const { data: results } = useSWR<PathResp[]>(
     () =>
       shouldFetchData
-        ? `/api/path?start=${start}&end=${end}${
+        ? `/api/path?start=${nameToMapKey(start)}&end=${nameToMapKey(end)}${
             filter.length ? `&filter=${filter.join(',')}` : ''
           }`
         : null,

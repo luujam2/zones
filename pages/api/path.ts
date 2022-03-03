@@ -18,7 +18,7 @@ export type PathResp = {
   line: string | undefined;
 };
 
-const nameToMapKey = (commonName: string) => {
+export const nameToMapKey = (commonName: string) => {
   return commonName
     .replace('Rail', '')
     .replace('Station', '')
@@ -88,8 +88,8 @@ export default async function handler(
     });
 
     // check if stations start and end are in zone 1, if so fetch nearest zone 2
-    const startNode = mappings[nameToMapKey(start)];
-    const endNode = mappings[nameToMapKey(end)];
+    const startNode = mappings[start];
+    const endNode = mappings[end];
 
     if (!startNode || !endNode) {
       return res.status(400).send('invalid stations');
