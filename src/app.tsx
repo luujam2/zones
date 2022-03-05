@@ -19,14 +19,16 @@ const CenteredSpin = styled.div`
 export type Station = {
   commonName: string;
   modes: string[];
-  zone: string;
+  zone?: string;
   lat: number;
   lon: number;
+  ids: string[];
 };
 
 export type Edge = {
   line: string;
   route: string;
+  weight?: number;
 };
 
 export type Connections = {
