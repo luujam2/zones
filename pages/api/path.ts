@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connections from '../../data/connections';
 import stations from '../../data/stations';
+import routes from '../../data/routes';
 import { Connections, Edge, Station } from '../../src/app';
 import { Graph, GraphDir } from '../../src/graph';
 import { GraphNode } from '../../src/node';
@@ -16,6 +17,7 @@ export type RadiusDataResp = {
 export type PathResp = {
   value: Station | undefined;
   line: string | undefined;
+  route: string | undefined;
 };
 
 export const nameToMapKey = (commonName: string) => {
@@ -70,19 +72,87 @@ export default async function handler(
 
     stations.forEach((station) => {
       const commonName = nameToMapKey(station.commonName);
-      const links = (connections as Connections)[commonName]?.connections;
+      const applicableRoutes = routes.filter((route) => {
+        return route.stations.includes(station.commonName);
+      });
 
-      if (links) {
-        links.forEach((link) => {
-          if (!filter.includes(link.line)) {
+      const stationToRouteLinks = applicableRoutes.reduce(
+        (
+          acc: { [key: string]: { routes: string[]; line: string }[] },
+          route
+        ) => {
+          const nextStation =
+            route.stations[route.stations.indexOf(station.commonName) + 1];
+
+          //same line, same station, different route = add to array of routes
+          //different line, same station, different route = add to new line
+          //same line, different station = add to nextstation map
+
+          // {
+          //   station: {
+          //     line: ?[]
+          //     routes: ?[]
+          //   }
+          // }
+
+          if (nextStation) {
+            // find if there's an existing line match
+            // if yes, add to routes
+            // if no, add a new entry
+            const existingLineEntry = acc[nextStation]?.find((ns) => {
+              return ns.line === route.line;
+            });
+            if (existingLineEntry) {
+              const existingLineEntryIndex = acc[nextStation]?.findIndex(
+                (ns) => {
+                  return ns.line === route.line;
+                }
+              );
+              return {
+                ...acc,
+                [nextStation]: [
+                  ...acc[nextStation].splice(existingLineEntryIndex, 1),
+                  {
+                    ...existingLineEntry,
+                    routes: [...existingLineEntry.routes, route.name],
+                  },
+                ],
+              };
+            }
+
+            return {
+              ...acc,
+              [nextStation]: [
+                ...(acc[nextStation] ?? []),
+                { routes: [route.name], line: route.line },
+              ],
+            };
+          }
+
+          return acc;
+        },
+        {}
+      );
+
+      for (const [key, value] of Object.entries(stationToRouteLinks)) {
+        value.forEach((meta) => {
+          // console.log(
+          //   'adding edge------',
+          //   meta.line,
+          //   meta.routes,
+          //   commonName,
+          //   key
+          // );
+          meta.routes.forEach((route) => {
             lond.addEdge(
               mappings[commonName].value,
-              mappings[link.name].value,
+              mappings[nameToMapKey(key)].value,
               {
-                line: link.line,
+                line: meta.line,
+                route: route,
               }
             );
-          }
+          });
         });
       }
     });
@@ -155,6 +225,7 @@ export default async function handler(
       return {
         value: resArray?.node?.[0].value,
         line: resArray?.node?.[1]?.line,
+        route: resArray?.node?.[1]?.route,
       };
     });
 

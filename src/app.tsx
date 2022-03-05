@@ -26,6 +26,7 @@ export type Station = {
 
 export type Edge = {
   line: string;
+  route: string;
 };
 
 export type Connections = {

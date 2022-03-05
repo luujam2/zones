@@ -120,6 +120,7 @@ export class Graph<T, U> {
       children.forEach((c) => {
         //for each child of a given node, check to see it's not pointing to the start node
         const [child] = c;
+
         if (!(child === node)) {
           // new distance is distance from node to node to process + 1
           const newdistance = distance ?? 0 + 1;

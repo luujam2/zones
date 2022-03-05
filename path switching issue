@@ -1,0 +1,20 @@
+node per station
+edge per route
+
+when dijkstras is run, edge has equal weighting regardless of which route is taken. this causes a lot of changing within the same line.
+there are no weighted edges. cannot add these dynamically when running dijkstras (same route then lower weight) as the previous node
+would be the same for both, the weight is equal and the route chosen will be random.
+
+
+example:
+
+canada water -> surrey quays -> queens road peckham. one train is required
+stratford -> queens road peckham. change at surrey quays.
+
+changing at surrey quays (overground route A) is the same weight as surrey quays (overground route B) when changing from canada water jubilee.
+because both edges (routes A and B) lead to the same node, it doesn't matter which one it takes. The next step is from surrey quays -> queens road peckham which is NOT available
+on route A but is available on route B. Therefore a change is done to route B.
+
+To fix:
+create nodes for each station + line e.g. stratford - dlr, stratford - central, stratford - overground. Link them with edge (line: 'change line'). Weights won't be needed as changing line within the same station
+is an extra edge so should be more expensive by default. penalising changing lines: could add higher weighting on same station edges.

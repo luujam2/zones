@@ -6,39 +6,8 @@ const tube = require('./tube');
 // import aaa from './overground';
 
 
-const constructProcessedData = (a, filename) => {
-  const array = a.stopPoints.map((b) => {
-    return {
-      commonName: b.commonName,
-      modes: b.modes,
-      id: b.id,
-      zone: b.additionalProperties.find((x) => x.key === 'Zone')?.value,
-      lat: b.lat,
-      lon: b.lon
-    };
-  });
-  const arrayUniqueByKey = [
-    ...new Map(array.map((item) => [item['commonName'], item])).values(),
-  ];
-  
-  fs.writeFileSync(filename, `module.exports = ${JSON.stringify(arrayUniqueByKey)}`);
-  console.log(JSON.stringify(arrayUniqueByKey));  
-  return arrayUniqueByKey;
-}
-
-const dlrData = constructProcessedData(dlr, 'data/dlr.js');
-const overgroundData = constructProcessedData(overground, 'data/overground.js');
-const tubeData = constructProcessedData(tube, 'data/tube.js');
-
-
-const array = overgroundData
-  .concat(dlrData)
-  .concat(tubeData)
-  .filter((stn) => stn.zone != null)
-  .map((stn) => {
-    return {
-      ...stn,
-      commonName: stn.commonName
+const normaliseName = (stn) => {
+  return stn
         .replace('Rail', '')
         .replace('Station', '')
         .replace('Underground', '')
@@ -53,10 +22,53 @@ const array = overgroundData
         .replace('Paddington - ', 'Paddington')
         .replace('Queens Park', "Queen's Park")
         .replace('StPancras', 'St Pancras')
-        .trim(),
+        .trim();
+}
+
+const constructProcessedData = (a) => {
+  const obj = a.filter((stoppoint) => stoppoint.stopType === 'NaptanMetroStation' || stoppoint.stopType === 'NaptanRailStation').reduce((acc, curr) => {
+
+    const stnName = normaliseName(curr.commonName);
+    if(stnName.includes('Clapham')){
+      console.log('ok!....', stnName);
+    }
+    
+    if(acc[stnName]) {
+      return {
+        ...acc,
+        [stnName]: {
+          ...acc[stnName],
+          zone: acc[stnName].zone ?? curr.zone,
+          modes: [...new Set([...acc[stnName].modes, ...curr.modes ])],
+          ids: [...acc[stnName].ids, curr.id]
+        }
+      }
+    }
+
+    return {
+      ...acc,
+      [stnName]: {
+        commonName: stnName,
+        modes: curr.modes,
+        ids: [curr.id],
+        zone: curr.additionalProperties.find((x) => x.key === 'Zone')?.value,
+        lat: curr.lat,
+        lon: curr.lon
+      }
     };
-  })
-  .sort((a, b) => {
+  }, {});
+  const arrayUniqueByKey = Object.values(obj);
+  
+  // fs.writeFileSync(filename, `module.exports = ${JSON.stringify(arrayUniqueByKey)}`);
+  // console.log(JSON.stringify(arrayUniqueByKey));  
+  return arrayUniqueByKey;
+}
+
+const data = constructProcessedData(dlr.stopPoints.concat(overground.stopPoints).concat(tube.stopPoints));
+
+
+const array = data
+    .sort((a, b) => {
     if (a.commonName < b.commonName) {
       return -1;
     }
@@ -66,9 +78,4 @@ const array = overgroundData
     return 0;
   });
 
-  const arrayUniqueByKey = [
-    ...new Map(array.map((item) => [item['commonName'], item])).values(),
-  ];
-
-
-  fs.writeFileSync('data/stations.js', `module.exports = ${JSON.stringify(arrayUniqueByKey)}`);
+  fs.writeFileSync('data/stations.js', `module.exports = ${JSON.stringify(array)}`);

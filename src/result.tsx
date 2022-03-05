@@ -114,7 +114,7 @@ const variants = {
   },
 };
 
-const Trip = ({ start, end, line, stations }: StationPairs) => {
+const Trip = ({ start, end, line, stations, route }: StationPairs) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
 
   return (
@@ -138,7 +138,7 @@ const Trip = ({ start, end, line, stations }: StationPairs) => {
               ) : (
                 <sub>1 stop</sub>
               )}
-
+              <div>{route}</div>
               <AnimatePresence>
                 {isOpen && (
                   <motion.div
@@ -247,14 +247,15 @@ type StationPairs = {
   end: string | undefined;
   line: string | undefined;
   stations: Station[];
+  route: string | undefined;
 };
 
 export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
   const data = result.map((res) => res);
 
-  const findNextChange = (index: number, currentLine: string | undefined) => {
+  const findNextChange = (index: number, currentRoute: string | undefined) => {
     return data.find((_, i) => {
-      return i > index && currentLine !== data[i + 1]?.line;
+      return i > index && currentRoute !== data[i + 1]?.route;
     });
   };
 
@@ -262,7 +263,8 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
     () =>
       data.reduce<StationPairs[]>((acc, curr, index) => {
         const stn = curr?.value;
-        const line = curr?.line;
+        // const line = curr?.line;
+        const route = curr?.route;
         //is station before it a different line?
         //if yes then it is the end of one line and start of the next
         //if station is first then it is the start of the line
@@ -271,9 +273,9 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
         }
 
         const isStationChange =
-          data[index + 1]?.line !== line && index !== data.length - 1;
+          data[index + 1]?.route !== route && index !== data.length - 1;
         if (index === 0 || isStationChange) {
-          const nextChange = findNextChange(index, data[index + 1]?.line);
+          const nextChange = findNextChange(index, data[index + 1]?.route);
 
           return [
             ...acc,
@@ -281,6 +283,7 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
               start: stn?.commonName,
               end: nextChange?.value?.commonName,
               line: nextChange?.line,
+              route: nextChange?.route,
               stations: [],
             } as StationPairs,
           ];
