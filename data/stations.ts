@@ -578,7 +578,7 @@ export default [
   {
     commonName: 'Clapham Junction',
     modes: ['national-rail', 'overground'],
-    ids: ['910GCLPHMJ1', '910GCLPHMJC'],
+    ids: ['910GCLPHMJC', '910GCLPHMJ1'],
     lat: 51.464187,
     lon: -0.170221,
   },

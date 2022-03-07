@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import Spinner from './spinner';
 import Result from './result';
 
-const fetcher = (args: any) => fetch(args).then((res) => res.json());
+export const fetcher = (args: any) => fetch(args).then((res) => res.json());
 
 const CenteredSpin = styled.div`
   display: flex;

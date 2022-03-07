@@ -2,8 +2,11 @@ import React, { useMemo } from 'react';
 import styled from '@emotion/styled';
 import { AnimatePresence, motion, useCycle } from 'framer-motion';
 import { colourList } from './utils';
-import { Station } from './app';
-import { PathResp } from '../pages/api/path';
+import { fetcher, Station } from './app';
+import { nameToMapKey, PathResp } from '../pages/api/path';
+import stationsData from '../data/stations';
+import useSWR from 'swr';
+import { Arrival } from '../pages/api/arrivals';
 
 const maxJourneyTimes: { [key: string]: number[] } = {
   '2-3': [100, 110, 120], //travel between zones 2 and 3
@@ -45,10 +48,10 @@ const Row = styled.div`
 `;
 
 const Name = styled.div`
-  flex: 0 0 20%;
+  flex: 0 0 50%;
 
   @media (max-width: 500px) {
-    flex: 0 0 50%;
+    flex: 0 0 80%;
   }
 `;
 
@@ -114,13 +117,87 @@ const variants = {
   },
 };
 
+const Route = styled.div`
+  font-size: 12px;
+`;
+
+const Arrival = styled.div`
+  font-size: 12px;
+`;
+
 const Trip = ({ start, end, line, stations, route }: StationPairs) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
+
+  const getId = (ids: string[] = []) => {
+    if (ids.length === 1) {
+      return ids[0];
+    }
+
+    if (line === 'dlr') {
+      return ids.find((id) => id.includes('940GZZDL'));
+    }
+
+    if (line === 'overground') {
+      return ids.find((id) => id.includes('910G'));
+    }
+
+    return ids.find((id) => id.includes('940GZZLU'));
+  };
+
+  const stopPointId = getId(
+    stationsData.find((stn) => {
+      return stn.commonName === start;
+    })?.ids
+  );
+
+  const destination = nameToMapKey(route?.split('&harr;')?.[1]?.trim() ?? '');
+
+  const destinationId = getId(
+    stationsData.find((stn) => {
+      return nameToMapKey(stn.commonName) === destination;
+    })?.ids
+  );
+  const { data: arrivals } = useSWR<Arrival[]>(
+    () =>
+      line !== 'osi'
+        ? `/api/arrivals?id=${
+            line === 'overground' ? 'london-overground' : line
+          }&stopPointId=${stopPointId}&destinationId=${destinationId}`
+        : null,
+    fetcher
+  );
+
+  const arrivalTimeInMinsTwo =
+    arrivals && arrivals.length
+      ? arrivals
+          .map((arrival) => {
+            return Math.floor(arrival.timeToStation / 60);
+          })
+          .sort((a, b) => {
+            return a - b;
+          })
+          .map((timeInMins) => {
+            if (timeInMins === 1) {
+              return '1 min';
+            }
+            if (timeInMins > 0) {
+              return `${timeInMins} mins`;
+            }
+
+            return 'due';
+          })
+          .join(', ')
+      : null;
+
+  const platform =
+    arrivals && arrivals.length ? arrivals[0].platformName : null;
 
   return (
     <Journey>
       <Row>
-        <MainName>{start}</MainName>
+        <MainName>
+          {start} {platform && `(${platform})`}
+        </MainName>
         <StyledStation start={true} />
       </Row>
       <Row>
@@ -129,6 +206,16 @@ const Trip = ({ start, end, line, stations, route }: StationPairs) => {
             <sub>Out of station interchange</sub>
           ) : (
             <>
+              <Arrival>
+                {arrivalTimeInMinsTwo !== null
+                  ? `Next trains: ${arrivalTimeInMinsTwo}`
+                  : 'Next train info not available'}
+              </Arrival>
+              <Route>
+                {route
+                  ? route.replace('&harr;', String.fromCharCode(8594))
+                  : ''}
+              </Route>
               {stations.length > 0 ? (
                 <button onClick={() => toggleOpen()}>
                   <sub>
@@ -138,7 +225,6 @@ const Trip = ({ start, end, line, stations, route }: StationPairs) => {
               ) : (
                 <sub>1 stop</sub>
               )}
-              <div>{route}</div>
               <AnimatePresence>
                 {isOpen && (
                   <motion.div
@@ -320,15 +406,15 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
 
   return (
     <>
-      <p>
-        <Row>{data.length} stops</Row>
+      <div>
+        <Row>{data.length - 1} stops</Row>
         <Row>
           Max journey time allowed:{' '}
           {`${Math.floor(maxJourneyTime / 60)} hours ${
             maxJourneyTime % 60
           } minutes`}
         </Row>
-      </p>
+      </div>
       {zoneOneStart && <ZoneOne>Walk from {zoneOneStart}</ZoneOne>}
       {stationChangePairs.map((pairs, index) => {
         return <Trip key={index} {...pairs} />;

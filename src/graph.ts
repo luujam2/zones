@@ -123,7 +123,7 @@ export class Graph<T, U> {
 
         if (!(child === node)) {
           // new distance is distance from node to node to process + 1
-          const newdistance = distance ?? 0 + (c as any)[1].weight ?? 1;
+          const newdistance = (distance ?? 0) + ((c as any)[1].weight ?? 1);
 
           // if the new distance is lower than the distance stored in the child or a distance doesn't exist for that child,
           // update the distances with the new value and the parent links with the new child

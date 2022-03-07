@@ -6,6 +6,7 @@ import { Connections, Edge, Station } from '../../src/app';
 import { Graph, GraphDir } from '../../src/graph';
 import { GraphNode } from '../../src/node';
 import osis from '../../data/osi';
+export const APP_KEY = '383ca4f4e9f446f3a204dfac6b7f3c86';
 
 type Data = {
   name: string;
@@ -67,55 +68,60 @@ export default async function handler(
     stations.forEach((station) => {
       const commonName = nameToMapKey(station.commonName);
       stationMappings[commonName] = station;
+      mappings[commonName] = [lond.addVertex(station)];
     });
 
     //go through the routes and create nodes per station
-    routes.forEach((route) => {
-      route.stations.reduce((acc: any, station, index) => {
-        const commonName = nameToMapKey(station);
-        const nextStation = route.stations[index + 1];
+    routes
+      .filter((route) => {
+        return !filter.includes(route.line);
+      })
+      .forEach((route) => {
+        route.stations.reduce((acc: any, station, index) => {
+          const commonName = nameToMapKey(station);
+          const nextStation = route.stations[index + 1];
 
-        //if station is zone 1 or next station is zone 1, don't add the link
-        if (
-          nextStation == null ||
-          stationMappings[commonName].zone === '1' ||
-          stationMappings[nameToMapKey(nextStation)].zone === '1'
-        ) {
-          return null;
-        }
-
-        if (nextStation) {
-          const nexs = { ...stationMappings[nameToMapKey(nextStation)] };
-          const [sourceNode, destinationNode] = lond.addEdge(
-            acc ? acc : { ...stationMappings[commonName] }, //new source station per route
-            nexs, //new target station per route
-            {
-              line: route.line,
-              route: route.name,
-            }
-          );
-
-          //add to mappings
-          if (!acc) {
-            const sourceNodeName = nameToMapKey(sourceNode.value.commonName);
-            mappings[sourceNodeName] = [
-              ...(mappings[sourceNodeName] ?? []),
-              sourceNode,
-            ];
+          //if station is zone 1 or next station is zone 1, don't add the link
+          if (
+            nextStation == null ||
+            stationMappings[commonName].zone === '1' ||
+            stationMappings[nameToMapKey(nextStation)].zone === '1'
+          ) {
+            return null;
           }
 
-          const destinationNodeName = nameToMapKey(
-            destinationNode.value.commonName
-          );
-          mappings[destinationNodeName] = [
-            ...(mappings[destinationNodeName] ?? []),
-            destinationNode,
-          ];
+          if (nextStation) {
+            const nexs = { ...stationMappings[nameToMapKey(nextStation)] };
+            const [sourceNode, destinationNode] = lond.addEdge(
+              acc ? acc : { ...stationMappings[commonName] }, //new source station per route
+              nexs, //new target station per route
+              {
+                line: route.line,
+                route: route.name,
+              }
+            );
 
-          return nexs;
-        }
-      }, null);
-    });
+            //add to mappings
+            if (!acc) {
+              const sourceNodeName = nameToMapKey(sourceNode.value.commonName);
+              mappings[sourceNodeName] = [
+                ...(mappings[sourceNodeName] ?? []),
+                sourceNode,
+              ];
+            }
+
+            const destinationNodeName = nameToMapKey(
+              destinationNode.value.commonName
+            );
+            mappings[destinationNodeName] = [
+              ...(mappings[destinationNodeName] ?? []),
+              destinationNode,
+            ];
+
+            return nexs;
+          }
+        }, null);
+      });
 
     //link same node common name to each other
     for (const [key, value] of Object.entries(mappings)) {
@@ -133,17 +139,19 @@ export default async function handler(
     }
 
     //link all nodes of one station to the osi counterpart
-    osis.map((osiPair) => {
+    osis.forEach((osiPair) => {
       const [osiSource, osiDest] = osiPair;
       const sourceStns = mappings[nameToMapKey(osiSource)];
       const destinationStns = mappings[nameToMapKey(osiDest)];
 
       if (destinationStns == null) {
         console.log('error-----', osiDest);
+        return;
       }
 
       if (sourceStns == null) {
         console.log('error-----', osiSource);
+        return;
       }
 
       sourceStns.forEach((sourceStn) => {
@@ -200,7 +208,7 @@ export default async function handler(
 
     if (startNode.zone === '1') {
       const startData = await fetch(
-        `https://api.tfl.gov.uk/StopPoint/?lat=${startNode.lat}&lon=${startNode.lon}&stopTypes=NaptanMetroStation&radius=1500`
+        `https://api.tfl.gov.uk/StopPoint/?lat=${startNode.lat}&lon=${startNode.lon}&stopTypes=NaptanMetroStation&radius=1500&app_key=${APP_KEY}`
       );
 
       const startJson: RadiusDataResp = await startData.json();
@@ -210,15 +218,13 @@ export default async function handler(
 
     if (endNode.zone === '1') {
       const endData = await fetch(
-        `https://api.tfl.gov.uk/StopPoint/?lat=${endNode.lat}&lon=${endNode.lon}&stopTypes=NaptanMetroStation&radius=1500`
+        `https://api.tfl.gov.uk/StopPoint/?lat=${endNode.lat}&lon=${endNode.lon}&stopTypes=NaptanMetroStation&radius=1500&app_key=${APP_KEY}`
       );
 
       const endJson: RadiusDataResp = await endData.json();
 
       closestEndStation = getNearestStation(endJson, endNode);
     }
-
-    console.log('end station----', closestEndStation);
 
     const result = lond.dijkstras(
       closestStartStation ?? mappings[nameToMapKey(start)][0],

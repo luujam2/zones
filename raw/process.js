@@ -28,11 +28,7 @@ const normaliseName = (stn) => {
 const constructProcessedData = (a) => {
   const obj = a.filter((stoppoint) => stoppoint.stopType === 'NaptanMetroStation' || stoppoint.stopType === 'NaptanRailStation').reduce((acc, curr) => {
 
-    const stnName = normaliseName(curr.commonName);
-    if(stnName.includes('Clapham')){
-      console.log('ok!....', stnName);
-    }
-    
+    const stnName = normaliseName(curr.commonName);   
     if(acc[stnName]) {
       return {
         ...acc,
