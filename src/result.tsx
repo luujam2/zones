@@ -157,12 +157,20 @@ const Trip = ({
     })?.ids
   );
 
+  const destination = nameToMapKey(route?.split('&harr;')?.[1]?.trim() ?? '');
+
+  const destinationId = getId(
+    stationsData.find((stn) => {
+      return nameToMapKey(stn.commonName) === destination;
+    })?.ids
+  );
+
   const { data: arrivals } = useSWR<Arrival[]>(
     () =>
       line !== 'osi'
         ? `/api/arrivals?id=${
             line === 'overground' ? 'london-overground' : line
-          }&stopPointId=${stopPointId}&direction=${direction}`
+          }&stopPointId=${stopPointId}&direction=${direction}&destinationId=${destinationId}`
         : null,
     fetcher
   );
