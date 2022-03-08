@@ -125,7 +125,14 @@ const Arrival = styled.div`
   font-size: 12px;
 `;
 
-const Trip = ({ start, end, line, stations, route }: StationPairs) => {
+const Trip = ({
+  start,
+  end,
+  line,
+  stations,
+  route,
+  direction,
+}: StationPairs) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
 
   const getId = (ids: string[] = []) => {
@@ -150,19 +157,12 @@ const Trip = ({ start, end, line, stations, route }: StationPairs) => {
     })?.ids
   );
 
-  const destination = nameToMapKey(route?.split('&harr;')?.[1]?.trim() ?? '');
-
-  const destinationId = getId(
-    stationsData.find((stn) => {
-      return nameToMapKey(stn.commonName) === destination;
-    })?.ids
-  );
   const { data: arrivals } = useSWR<Arrival[]>(
     () =>
       line !== 'osi'
         ? `/api/arrivals?id=${
             line === 'overground' ? 'london-overground' : line
-          }&stopPointId=${stopPointId}&destinationId=${destinationId}`
+          }&stopPointId=${stopPointId}&direction=${direction}`
         : null,
     fetcher
   );
@@ -334,6 +334,7 @@ type StationPairs = {
   line: string | undefined;
   stations: Station[];
   route: string | undefined;
+  direction: string | undefined;
 };
 
 export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
@@ -370,6 +371,7 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
               end: nextChange?.value?.commonName,
               line: nextChange?.line,
               route: nextChange?.route,
+              direction: nextChange?.direction,
               stations: [],
             } as StationPairs,
           ];

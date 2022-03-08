@@ -29,6 +29,7 @@ export type Edge = {
   line: string;
   route: string;
   weight?: number;
+  direction: string;
 };
 
 export type Connections = {

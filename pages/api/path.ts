@@ -20,6 +20,7 @@ export type PathResp = {
   value: Station | undefined;
   line: string | undefined;
   route: string | undefined;
+  direction: string | undefined;
 };
 
 export const nameToMapKey = (commonName: string) => {
@@ -98,6 +99,7 @@ export default async function handler(
               {
                 line: route.line,
                 route: route.name,
+                direction: route.direction,
               }
             );
 
@@ -132,6 +134,7 @@ export default async function handler(
               line: 'in-station',
               route: 'in-station',
               weight: 5,
+              direction: 'N/A',
             });
           }
         }
@@ -159,11 +162,13 @@ export default async function handler(
           lond.addEdge(sourceStn.value, destinationStn.value, {
             line: 'osi',
             route: 'osi',
+            direction: 'N/A',
           });
 
           lond.addEdge(destinationStn.value, sourceStn.value, {
             line: 'osi',
             route: 'osi',
+            direction: 'N/A',
           });
         });
       });
@@ -239,6 +244,7 @@ export default async function handler(
           value: resArray?.node?.[0].value,
           line: resArray?.node?.[1]?.line,
           route: resArray?.node?.[1]?.route,
+          direction: resArray?.node?.[1]?.direction,
         };
       })
       .filter((item) => item.line !== 'in-station');

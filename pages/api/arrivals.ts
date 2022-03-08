@@ -6,6 +6,7 @@ import { APP_KEY } from './path';
 export type Arrival = {
   platformName: string;
   timeToStation: number;
+  direction: string;
 };
 
 export default async function handler(
@@ -14,13 +15,23 @@ export default async function handler(
 ) {
   const id = req.query.id;
   const stopPointId = req.query.stopPointId;
-  const destinationId = req.query.destinationId;
+  const direction = req.query.direction;
 
   const data = await fetch(
-    `https://api.tfl.gov.uk/Line/${id}/Arrivals/${stopPointId}?direction=all&destinationStationId=${destinationId}&app_key=${APP_KEY}`
+    `https://api.tfl.gov.uk/Line/${id}/Arrivals/${stopPointId}?direction=all&app_key=${APP_KEY}`
   );
 
-  const result = await data.json();
+  const result: Arrival[] = await data.json();
 
-  res.status(200).json(result);
+  const sortedResult = result.sort((a, b) => a.timeToStation - b.timeToStation);
+
+  const filteredByDirection = sortedResult.filter((res) => {
+    return res.direction === direction;
+  });
+
+  if (filteredByDirection.length === 0) {
+    return res.status(200).json(sortedResult.slice(0, 3));
+  }
+
+  res.status(200).json(filteredByDirection.slice(0, 3));
 }
