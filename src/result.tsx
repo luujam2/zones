@@ -230,17 +230,26 @@ const Trip = ({
             <sub>Out of station interchange</sub>
           ) : (
             <>
-              <Arrival>
-                {arrivalTimeInMinsTwo !== null
-                  ? `Next trains: ${arrivalTimeInMinsTwo}`
-                  : 'Next train info not available'}
-              </Arrival>
               <Route>
                 {route
-                  ? route.replace('&harr;', String.fromCharCode(8594))
+                  ? `Route: ${route.replace(
+                      '&harr;',
+                      String.fromCharCode(8594)
+                    )}`
                   : ''}
               </Route>
-              <Duration>{`Estimated duration: ${legTime} mins`}</Duration>
+              <Arrival>
+                {arrivalTimeInMinsTwo !== null ? (
+                  <div>
+                    Next trains: <strong>{arrivalTimeInMinsTwo}</strong>
+                  </div>
+                ) : (
+                  'Next train info not available'
+                )}
+              </Arrival>
+              <Duration>
+                Estimated duration: <strong>{`${legTime} mins`}</strong>
+              </Duration>
               <Stops>
                 {stations.length > 0 ? (
                   <button onClick={() => toggleOpen()}>
@@ -452,9 +461,10 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
           } minutes`}
         </Row>
         <Row>
-          Estimated journey time (not including transfers or walking):{' '}
-          {`${estimatedJourneyTime}mins`}
+          Est. journey time (excl. transfers):{' '}
+          <strong>{`${estimatedJourneyTime} mins`}</strong>
         </Row>
+        <br />
       </div>
       {zoneOneStart && <ZoneOne>Walk from {zoneOneStart}</ZoneOne>}
       {stationChangePairs.map((pairs, index) => {
