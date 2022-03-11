@@ -119,14 +119,25 @@ const variants = {
 
 const Route = styled.div`
   font-size: 12px;
+  margin-bottom: 5px;
 `;
 
 const Arrival = styled.div`
   font-size: 12px;
+  margin-bottom: 5px;
 `;
 
 const Duration = styled.div`
   font-size: 12px;
+  margin-bottom: 5px;
+`;
+
+const Stops = styled.div`
+  margin-bottom: 10px;
+`;
+
+const StopText = styled.div`
+  font-size: 10px;
 `;
 
 const Trip = ({
@@ -230,15 +241,17 @@ const Trip = ({
                   : ''}
               </Route>
               <Duration>{`Estimated duration: ${legTime} mins`}</Duration>
-              {stations.length > 0 ? (
-                <button onClick={() => toggleOpen()}>
-                  <sub>
-                    {isOpen ? 'Hide' : 'See'} {`stops (${stations.length})`}
-                  </sub>
-                </button>
-              ) : (
-                <sub>1 stop</sub>
-              )}
+              <Stops>
+                {stations.length > 0 ? (
+                  <button onClick={() => toggleOpen()}>
+                    <StopText>
+                      {isOpen ? 'Hide' : 'See'} {`stops (${stations.length})`}
+                    </StopText>
+                  </button>
+                ) : (
+                  <StopText>1 stop</StopText>
+                )}
+              </Stops>
               <AnimatePresence>
                 {isOpen && (
                   <motion.div

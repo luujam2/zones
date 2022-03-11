@@ -17,18 +17,16 @@ const Submit = styled.input`
 `;
 
 export default ({
-  stations,
   setStart,
   start,
   setEnd,
   end,
   setShouldFetch,
 }: {
-  stations: Station[];
-  setStart: React.Dispatch<React.SetStateAction<string | undefined>>;
-  start: string | undefined;
-  setEnd: React.Dispatch<React.SetStateAction<string | undefined>>;
-  end: string | undefined;
+  setStart: React.Dispatch<React.SetStateAction<string>>;
+  start: string;
+  setEnd: React.Dispatch<React.SetStateAction<string>>;
+  end: string;
   setShouldFetch: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   return (
@@ -44,8 +42,8 @@ export default ({
           <Input
             id="start-station"
             label="Start station"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setStart(e.target.value);
+            onChange={(value) => {
+              setStart(value);
             }}
             value={start}
           />
@@ -55,17 +53,13 @@ export default ({
           <Input
             id="end-station"
             label="Destination"
-            onChange={(e) => {
-              setEnd(e.target.value);
+            onChange={(value) => {
+              setEnd(value);
             }}
             value={end}
           />
         </FormItem>
-        <datalist id="stations">
-          {stations.map((station) => (
-            <option key={station.commonName} value={station.commonName} />
-          ))}
-        </datalist>
+
         <FormItem>
           <Submit type="submit" value="Go" />
         </FormItem>

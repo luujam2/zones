@@ -42,8 +42,8 @@ const validStations = stations.map((stn) => stn.commonName);
 
 export default () => {
   const [filter, setFilter] = useState<string[]>([]);
-  const [start, setStart] = useState<string>();
-  const [end, setEnd] = useState<string>();
+  const [start, setStart] = useState<string>('');
+  const [end, setEnd] = useState<string>('');
   const [shouldFetch, setShouldFetch] = useState(false);
 
   const shouldFetchData =
@@ -83,7 +83,6 @@ export default () => {
         filter={filter}
       />
       <Search
-        stations={stations}
         start={start}
         end={end}
         setStart={setStart}
