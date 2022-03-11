@@ -125,6 +125,10 @@ const Arrival = styled.div`
   font-size: 12px;
 `;
 
+const Duration = styled.div`
+  font-size: 12px;
+`;
+
 const Trip = ({
   start,
   end,
@@ -132,9 +136,10 @@ const Trip = ({
   stations,
   route,
   direction,
+  time,
 }: StationPairs) => {
   const [isOpen, toggleOpen] = useCycle(false, true);
-
+  const legTime = time.reduce((a, b) => a + b, 0);
   const getId = (ids: string[] = []) => {
     if (ids.length === 1) {
       return ids[0];
@@ -224,6 +229,7 @@ const Trip = ({
                   ? route.replace('&harr;', String.fromCharCode(8594))
                   : ''}
               </Route>
+              <Duration>{`Estimated duration: ${legTime} mins`}</Duration>
               {stations.length > 0 ? (
                 <button onClick={() => toggleOpen()}>
                   <sub>
@@ -343,6 +349,7 @@ type StationPairs = {
   stations: Station[];
   route: string | undefined;
   direction: string | undefined;
+  time: number[];
 };
 
 export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
@@ -364,6 +371,7 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
         //if yes then it is the end of one line and start of the next
         //if station is first then it is the start of the line
         if (index === data.length - 1 || stn == null) {
+          curr?.time && acc[acc.length - 1].time.push(curr.time);
           return acc;
         }
 
@@ -381,10 +389,12 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
               route: nextChange?.route,
               direction: nextChange?.direction,
               stations: [],
+              time: nextChange?.time ? [nextChange?.time] : [],
             } as StationPairs,
           ];
         } else {
           acc[acc.length - 1].stations.push(stn);
+          curr?.time && acc[acc.length - 1].time.push(curr.time);
           return acc;
         }
       }, []),
@@ -414,6 +424,10 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
     return <Row>Journey not possible</Row>;
   }
 
+  const estimatedJourneyTime = stationChangePairs.reduce((acc, curr) => {
+    return acc + curr.time.reduce((acc, curr) => acc + curr, 0);
+  }, 0);
+
   return (
     <>
       <div>
@@ -423,6 +437,10 @@ export default ({ result, zoneOneStart, zoneOneEnd }: ResultProps) => {
           {`${Math.floor(maxJourneyTime / 60)} hours ${
             maxJourneyTime % 60
           } minutes`}
+        </Row>
+        <Row>
+          Estimated journey time (not including transfers or walking):{' '}
+          {`${estimatedJourneyTime}mins`}
         </Row>
       </div>
       {zoneOneStart && <ZoneOne>Walk from {zoneOneStart}</ZoneOne>}

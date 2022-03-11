@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import connections from '../../data/connections';
 import stations from '../../data/stations';
-import routes from '../../data/routes';
+import routes from '../../data/route-with-times';
 import { Connections, Edge, Station } from '../../src/app';
 import { Graph, GraphDir } from '../../src/graph';
 import { GraphNode } from '../../src/node';
@@ -21,6 +21,7 @@ export type PathResp = {
   line: string | undefined;
   route: string | undefined;
   direction: string | undefined;
+  time: number | undefined;
 };
 
 export const nameToMapKey = (commonName: string) => {
@@ -79,20 +80,24 @@ export default async function handler(
       })
       .forEach((route) => {
         route.stations.reduce((acc: any, station, index) => {
-          const commonName = nameToMapKey(station);
+          const commonName = nameToMapKey(station.name);
           const nextStation = route.stations[index + 1];
 
           //if station is zone 1 or next station is zone 1, don't add the link
           if (
             nextStation == null ||
             stationMappings[commonName].zone === '1' ||
-            stationMappings[nameToMapKey(nextStation)].zone === '1'
+            stationMappings[nameToMapKey(nextStation.name)].zone === '1'
           ) {
             return null;
           }
 
           if (nextStation) {
-            const nexs = { ...stationMappings[nameToMapKey(nextStation)] };
+            const nexs = { ...stationMappings[nameToMapKey(nextStation.name)] };
+
+            if (station.time === 0) {
+              console.log('SHOULD NOT BE ADDING THIS EDGE!');
+            }
             const [sourceNode, destinationNode] = lond.addEdge(
               acc ? acc : { ...stationMappings[commonName] }, //new source station per route
               nexs, //new target station per route
@@ -100,6 +105,7 @@ export default async function handler(
                 line: route.line,
                 route: route.name,
                 direction: route.direction,
+                weight: station.time,
               }
             );
 
@@ -245,6 +251,7 @@ export default async function handler(
           line: resArray?.node?.[1]?.line,
           route: resArray?.node?.[1]?.route,
           direction: resArray?.node?.[1]?.direction,
+          time: resArray?.node?.[1]?.weight,
         };
       })
       .filter((item) => item.line !== 'in-station');
