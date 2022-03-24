@@ -17,7 +17,6 @@ export default [
   ['New Cross ELL', 'New Cross Gate'],
   ['Manor House', 'Harringay Green Lanes'],
   ['Hackney Downs', 'Hackney Central'],
-  ['Manor House', 'Woodgrange Park'],
   ['Walthamstow Central', 'Walthamstow Queens Road'],
   ['Caledonian Road', 'Caledonian Road & Barnsbury'],
 ];
